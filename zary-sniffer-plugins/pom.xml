@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.zary</groupId>
+        <artifactId>zary-sniffer</artifactId>
+        <version>1.0.1</version>
+    </parent>
+
+    <artifactId>zary-sniffer-plugins</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>demo-plugin</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- agent最终输出目录 -->
+        <agent.package.dir>${project.build.directory}/../../../zary-sniffer-x-packages/admx-agent</agent.package.dir>
+        <!-- agent最终输出目录下的plugins目录 -->
+        <plugin.dir>${agent.package.dir}/plugins</plugin.dir>
+        <!-- 第三方包重定向命名空间前缀 -->
+        <shade.package>com.zary.admx.agent.depencies</shade.package>
+    </properties>
+    <!-- 插件全局依赖，但插件本身被agent动态加载，所以provided -->
+    <dependencies>
+        <dependency>
+            <groupId>com.zary</groupId>
+            <artifactId>zary-admx-agent-core</artifactId>
+            <version>1.0.5</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zary</groupId>
+            <artifactId>zary-sniffer-transfer</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zary</groupId>
+            <artifactId>zary-sniffer-tracing</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+    <!-- 插件包打包配置，实现下属插件统一打包并移动到zary-adm-agent输出目录指定位置 -->
+    <build>
+        <plugins>
+            <!-- 指定编译环境 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <skip>true</skip>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+            <!-- maven-shade-plugin打包为独立jar包 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <!--是否带shaded后缀，默认true-->
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <!--是否生成依赖排除文件，默认true-->
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                            <createSourcesJar>false</createSourcesJar>
+                            <shadeSourcesContent>false</shadeSourcesContent>
+                            <!--bytebuddy重定向，防止命名空间冲突-->
+                            <relocations>
+                                <relocation>
+                                    <pattern>net.bytebuddy</pattern>
+                                    <shadedPattern>${shade.package}.net.bytebuddy</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- maven-antrun-plugin 将打包生成的plugin包移动到agent生成目录下plugins文件夹中 -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!--ant任务定义-->
+                                <taskdef resource="net/sf/antcontrib/antcontrib.properties"
+                                         classpathref="maven.runtime.classpath"/>
+                                <if>
+                                    <equals arg1="${project.packaging}" arg2="jar"/>
+                                    <then>
+                                        <mkdir dir="${plugin.dir}"/>
+                                        <copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar"
+                                              tofile="${plugin.dir}/${project.artifactId}-${project.version}.jar"
+                                              overwrite="true"/>
+                                    </then>
+                                </if>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>ant-contrib</groupId>
+                        <artifactId>ant-contrib</artifactId>
+                        <version>1.0b3</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>ant</groupId>
+                                <artifactId>ant</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.ant</groupId>
+                        <artifactId>ant-nodeps</artifactId>
+                        <version>1.8.1</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <!--skip deploy-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.0.0-M1</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

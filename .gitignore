@@ -1,0 +1,34 @@
+############ Tools & IDE
+.idea/
+.vs/
+.git/
+
+
+############ Java
+# Compiled class file
+*.class
+*.jar
+*.war
+*.ear
+**/target
+
+############ Donet
+obj/
+
+############ Other
+# Log file
+*.log
+~$*.docx
+~$*.doc
+~$*.xlsx
+~$*.xls
+~$*.vsdx
+~$*.pptx
+~$*.ppt
+**/*.iml
+*.iml
+*.iml
+/logs/*/info.log.gz
+**/dependency-reduced-pom.xml
+/zary-adm-x-packages/adm-agent/adm-agent.tar
+/zary-adm-x-packages/adm-agent/adm-agent.tar.gz
