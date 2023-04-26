@@ -1,9 +1,10 @@
 package com.zary.sniffer.plugin;
 
-import com.zary.admx.agent.core.plugin.AbstractPlugin;
-import com.zary.admx.agent.core.plugin.point.IConstructorPoint;
-import com.zary.admx.agent.core.plugin.point.IInstanceMethodPoint;
-import com.zary.admx.agent.core.plugin.point.IStaticMethodPoint;
+
+import com.zary.sniffer.agent.core.plugin.AbstractPlugin;
+import com.zary.sniffer.agent.core.plugin.point.IConstructorPoint;
+import com.zary.sniffer.agent.core.plugin.point.IInstanceMethodPoint;
+import com.zary.sniffer.agent.core.plugin.point.IStaticMethodPoint;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;

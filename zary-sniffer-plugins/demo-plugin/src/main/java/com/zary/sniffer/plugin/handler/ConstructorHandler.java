@@ -1,7 +1,7 @@
 package com.zary.sniffer.plugin.handler;
 
-import com.zary.admx.agent.core.plugin.handler.IConstructorHandler;
 
+import com.zary.sniffer.agent.core.plugin.handler.IConstructorHandler;
 
 public class ConstructorHandler implements IConstructorHandler {
 

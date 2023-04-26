@@ -28,21 +28,7 @@
     <dependencies>
         <dependency>
             <groupId>com.zary</groupId>
-            <artifactId>zary-admx-agent-core</artifactId>
-            <version>1.0.5</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zary</groupId>
-            <artifactId>zary-sniffer-transfer</artifactId>
-            <version>1.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zary</groupId>
-            <artifactId>zary-sniffer-tracing</artifactId>
+            <artifactId>zary-sniffer-agent-core</artifactId>
             <version>1.0.1</version>
             <scope>provided</scope>
         </dependency>

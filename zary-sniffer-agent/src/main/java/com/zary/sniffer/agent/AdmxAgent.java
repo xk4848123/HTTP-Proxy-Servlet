@@ -1,7 +1,6 @@
 package com.zary.sniffer.agent;
 
-import com.zary.admx.agent.core.AgentStarter;
-
+import com.zary.sniffer.agent.core.AgentStarter;
 
 import java.lang.instrument.Instrumentation;
 

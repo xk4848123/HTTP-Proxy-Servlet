@@ -10,10 +10,12 @@
     <version>1.0.1</version>
     <modules>
         <module>zary-sniffer-agent</module>
+        <module>zary-sniffer-agent-core</module>
         <module>zary-sniffer-server</module>
         <module>zary-sniffer-transfer</module>
         <module>zary-sniffer-plugins</module>
         <module>zary-sniffer-tracing</module>
+        <module>zary-sniffer-util</module>
     </modules>
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

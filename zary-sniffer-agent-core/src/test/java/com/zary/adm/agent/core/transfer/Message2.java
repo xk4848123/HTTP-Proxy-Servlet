@@ -1,17 +1,18 @@
-package com.zary.sniffer.transfer;
+package com.zary.adm.agent.core.transfer;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @ToString
-@NoArgsConstructor
-@AllArgsConstructor
 public class Message2 {
 
     Long innerType;
 
     String msg;
+
+    public Message2(Long innerType, String msg) {
+        this.innerType = innerType;
+        this.msg = msg;
+    }
 
     public Long getInnerType() {
         return innerType;
