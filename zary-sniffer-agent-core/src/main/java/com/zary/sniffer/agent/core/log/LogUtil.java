@@ -97,11 +97,13 @@ public class LogUtil {
     }
 
     public static void info(String title, String message) {
-        try {
-            getLogProducer().info(title, message);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            getLogProducer().info(title, message);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        System.out.println("title:" + title);
+        System.out.println("message" + message);
     }
 
     public static void info(String title, Throwable e) {

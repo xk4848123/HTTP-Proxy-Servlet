@@ -6,19 +6,19 @@ import java.lang.instrument.Instrumentation;
 
 public class ModuleExporter {
     private static final String[] ADM_CORE_CLASSES = {
-            "com.zary.admx.agent.core.plugin.define.HandlerBeforeResult",
-            "com.zary.admx.agent.core.plugin.define.IMorphCall",
-            "com.zary.admx.agent.core.plugin.handler.IConstructorHandler",
-            "com.zary.admx.agent.core.plugin.handler.IInstanceMethodHandler",
-            "com.zary.admx.agent.core.plugin.handler.IStaticMethodHandler",
-            "com.zary.admx.agent.core.plugin.interceptor.ConstructorInterceptor",
-            "com.zary.admx.agent.core.plugin.interceptor.InstanceMethodInterceptor",
-            "com.zary.admx.agent.core.plugin.interceptor.InstanceMethodMorphInterceptor",
-            "com.zary.admx.agent.core.plugin.interceptor.StaticMethodInterceptor",
-            "com.zary.admx.agent.core.plugin.interceptor.StaticMethodMorphInterceptor",
-            "com.zary.admx.agent.core.plugin.point.IConstructorPoint",
-            "com.zary.admx.agent.core.plugin.point.IInstanceMethodPoint",
-            "com.zary.admx.agent.core.plugin.point.IStaticMethodPoint"
+            "com.zary.sniffer.agent.core.plugin.define.HandlerBeforeResult",
+            "com.zary.sniffer.agent.core.plugin.define.IMorphCall",
+            "com.zary.sniffer.agent.core.plugin.handler.IConstructorHandler",
+            "com.zary.sniffer.agent.core.plugin.handler.IInstanceMethodHandler",
+            "com.zary.sniffer.agent.core.plugin.handler.IStaticMethodHandler",
+            "com.zary.sniffer.agent.core.plugin.interceptor.ConstructorInterceptor",
+            "com.zary.sniffer.agent.core.plugin.interceptor.InstanceMethodInterceptor",
+            "com.zary.sniffer.agent.core.plugin.interceptor.InstanceMethodMorphInterceptor",
+            "com.zary.sniffer.agent.core.plugin.interceptor.StaticMethodInterceptor",
+            "com.zary.sniffer.agent.core.plugin.interceptor.StaticMethodMorphInterceptor",
+            "com.zary.sniffer.agent.core.plugin.point.IConstructorPoint",
+            "com.zary.sniffer.agent.core.plugin.point.IInstanceMethodPoint",
+            "com.zary.sniffer.agent.core.plugin.point.IStaticMethodPoint"
     };
 
 

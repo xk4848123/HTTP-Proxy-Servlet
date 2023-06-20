@@ -1,1 +1,2 @@
-plugin.method=com.zary.sniffer.plugin.MethodPlugin
+MethodPlugin=com.zary.sniffer.plugin.MethodPlugin
+ConstructorPlugin=com.zary.sniffer.plugin.ConstructorPlugin

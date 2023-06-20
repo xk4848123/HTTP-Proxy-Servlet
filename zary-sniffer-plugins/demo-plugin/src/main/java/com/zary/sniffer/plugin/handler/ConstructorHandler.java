@@ -8,5 +8,7 @@ public class ConstructorHandler implements IConstructorHandler {
     @Override
     public void onConstruct(Object instance, Object[] allArguments) {
 
+        System.out.println("instance:" + instance);
+
     }
 }

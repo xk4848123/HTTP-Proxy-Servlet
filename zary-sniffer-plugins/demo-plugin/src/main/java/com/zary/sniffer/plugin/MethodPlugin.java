@@ -13,7 +13,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 public class MethodPlugin extends AbstractPlugin {
     private static final String HANDLER = "com.zary.sniffer.plugin.handler.MethodHandler";
 
-    private static final String TYPE = "com.telit.microgenerator.LogoPrinter";
+    private static final String TYPE = "com.telit.microgenerator.BannerPrinter";
 
     @Override
     public ElementMatcher<TypeDescription> getPluginTypeMatcher() {
@@ -30,7 +30,7 @@ public class MethodPlugin extends AbstractPlugin {
         IInstanceMethodPoint point = new IInstanceMethodPoint() {
             @Override
             public ElementMatcher<MethodDescription> getMethodsMatcher() {
-                return ElementMatchers.named("print2");
+                return ElementMatchers.named("print");
             }
 
             @Override

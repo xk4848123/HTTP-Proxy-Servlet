@@ -29,7 +29,6 @@ public class MethodHandler implements IInstanceMethodHandler {
         Span span = curTracer.activeSpan();
         span.finish();
         List<AdmxSpan> spans = ((AdmxTracer) curTracer).finishedSpans();
-        System.out.println(spans.toString());
         LogUtil.info("spans", spans.toString());
 
         return returnValue;

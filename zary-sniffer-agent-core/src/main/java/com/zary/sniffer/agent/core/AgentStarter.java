@@ -93,6 +93,7 @@ public class AgentStarter {
     private void agentStart(Instrumentation inst, Consumer<ProtectionDomain> protectionDomainConsumer) throws IOException {
         AgentClassLoader classLoader = new AgentClassLoader(AgentStarter.class.getClassLoader(), new String[]{AdmxAgentConsts.plugin_dir});
         List<AbstractPlugin> plugins = PluginLoader.loadPlugins(classLoader);
+        System.out.println("plugins size:" + plugins.size());
 
         AgentBuilder agentBuilder = initAgentBuilder();
         ModuleExporter.export(inst, agentBuilder);
