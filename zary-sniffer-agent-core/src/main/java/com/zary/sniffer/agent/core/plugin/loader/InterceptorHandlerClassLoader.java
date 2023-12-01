@@ -1,6 +1,6 @@
 package com.zary.sniffer.agent.core.plugin.loader;
 
-import com.zary.sniffer.agent.core.consts.AdmxAgentConsts;
+import com.zary.sniffer.agent.core.consts.CoreConsts;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +49,7 @@ public class InterceptorHandlerClassLoader {
             try {
                 agentLoader = classloader_relation_cache.get(targetClassLoader);
                 if (agentLoader == null) {
-                    agentLoader = new AgentClassLoader(targetClassLoader, new String[]{AdmxAgentConsts.plugin_dir});
+                    agentLoader = new AgentClassLoader(targetClassLoader, new String[]{CoreConsts.PLUGIN_DIR});
                     classloader_relation_cache.put(targetClassLoader, agentLoader);
                 }
             } finally {

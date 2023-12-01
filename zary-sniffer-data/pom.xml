@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.zary</groupId>
+        <artifactId>zary-sniffer</artifactId>
+        <version>1.0.1</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>zary-sniffer-data</artifactId>
+    <!-- dependencies -->
+    <dependencies>
+        <dependency>
+            <groupId>com.zary</groupId>
+            <artifactId>zary-sniffer-util</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+    </dependencies>
+    <!-- build -->
+    <build>
+        <finalName>zary-sniffer-data</finalName>
+        <plugins>
+            <!-- compile with 1.8 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <skip>true</skip>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

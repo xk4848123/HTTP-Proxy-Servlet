@@ -30,5 +30,5 @@ obj/
 *.iml
 /logs/*/info.log.gz
 **/dependency-reduced-pom.xml
-/zary-adm-x-packages/adm-agent/adm-agent.tar
-/zary-adm-x-packages/adm-agent/adm-agent.tar.gz
+/zary-sniffer-x-packages/sniffer-agent/sniffer-agent.tar
+/zary-sniffer-x-packages/sniffer-agent/sniffer-agent.tar.gz

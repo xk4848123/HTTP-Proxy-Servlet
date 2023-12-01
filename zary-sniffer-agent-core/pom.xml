@@ -17,19 +17,6 @@
             <artifactId>zary-sniffer-util</artifactId>
             <version>1.0.1</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.zary</groupId>
-            <artifactId>zary-sniffer-transfer</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zary</groupId>
-            <artifactId>zary-sniffer-tracing</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-
         <!--byte buddy-->
         <dependency>
             <groupId>net.bytebuddy</groupId>
@@ -44,35 +31,16 @@
             <!--<version>1.8.20</version>-->
         </dependency>
 
-        <!--disruptor-->
         <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
             <version>3.3.10</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.6</version>
-        </dependency>
-
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>2.9.0</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/junit/junit -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
 
     </dependencies>
     <!-- build -->
     <build>
-        <finalName>zary-admx-agent-core</finalName>
+        <finalName>zary-sniffer-agent-core</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -80,8 +48,8 @@
                 <version>3.8.0</version>
                 <configuration>
                     <skip>true</skip>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
         </plugins>

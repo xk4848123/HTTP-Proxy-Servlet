@@ -1,18 +1,13 @@
 package com.zary.sniffer.agent.core.log;
 
 import com.zary.sniffer.util.DateUtil;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 /**
  * 日志消息体 disruptor event
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class LogEvent {
     /**
      * 级别
@@ -26,6 +21,39 @@ public class LogEvent {
      * 内容
      */
     private String message;
+
+    public LogLevel getLevel() {
+        return level;
+    }
+
+    public void setLevel(LogLevel level) {
+        this.level = level;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public LogEvent() {
+    }
+
+    public LogEvent(LogLevel level, String title, String message) {
+        this.level = level;
+        this.title = title;
+        this.message = message;
+    }
 
     @Override
     public String toString() {

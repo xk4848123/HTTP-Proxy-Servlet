@@ -1,0 +1,2 @@
+plugin.httpclient.request=com.zary.sniffer.agent.plugin.httpclient.RequestBuilderPlugin
+plugin.httpclient.client=com.zary.sniffer.agent.plugin.httpclient.ClientBuilderPlugin

@@ -43,7 +43,7 @@ public class LogUtil {
 
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread((ThreadGroup) null, r, "admx-log-thread-" + index.getAndIncrement());
+                return new Thread((ThreadGroup) null, r, "sniffer-log-thread-" + index.getAndIncrement());
             }
         };
     }
@@ -56,7 +56,7 @@ public class LogUtil {
             LogWriter.init(dir, fileMaxSize);
             ThreadFactory threadFactory = getDisruptorThreadFactory();
             LogEventFactory eventFactory = new LogEventFactory();
-            disruptor = new Disruptor<LogEvent>(eventFactory, buffer_size, threadFactory, ProducerType.MULTI, waitStrategy);
+            disruptor = new Disruptor<>(eventFactory, buffer_size, threadFactory, ProducerType.MULTI, waitStrategy);
             disruptor.handleEventsWith(new LogEventHandler());
             disruptor.start();
 
@@ -69,7 +69,7 @@ public class LogUtil {
     /**
      * 实例化一个生产者
      */
-    private static LogProducer getLogProducer() {
+    public static LogProducer getLogProducer() {
         return defaultProducer;
     }
 

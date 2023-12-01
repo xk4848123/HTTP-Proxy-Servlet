@@ -17,38 +17,24 @@ import java.util.Date;
  * @author xulibo
  */
 public class LogWriter {
-    /**
-     * 日志文件名称头
-     */
-    private static final String logFileHead = "adm-agent-log-";
-    /**
-     * 当前日志文件
-     */
+
+    private static final String logFileHead = "sniffer-agent-log-";
+
     private static String logFileCurrent = "";
-    /**
-     * 单个日志文件大小上限(K)
-     */
+
     private static int logFileMaxSize = 5120;
-    /**
-     * 日志根目录
-     */
+
     private static String logDir = "";
-    /**
-     * 日志输出流
-     */
+
     private static FileOutputStream outputStream = null;
 
-    /**
-     * 初始化
-     */
+
     public static void init(String dir, int fileMaxSize) {
         logDir = dir;
         logFileMaxSize = fileMaxSize;
     }
 
-    /**
-     * 创建新日志文件
-     */
+
     private static void createLogFile() throws Exception {
         //先清空并释放当前写入的文件流
         flushAndDispose();
@@ -56,7 +42,7 @@ public class LogWriter {
         if (!DirectoryUtil.isExsit(logDir)) {
             DirectoryUtil.create(logDir);
         }
-        //创建新日志文件(时间戳文件名，3次防重) adm-agent-log-20190601-080808.log
+        //创建新日志文件(时间戳文件名，3次防重) sniffer-agent-log-20190601-080808.log
         String newFileName = "";
         for (int i = 0; i < 3; i++) {
             newFileName = String.format("%s/%s%s.log",
@@ -72,15 +58,10 @@ public class LogWriter {
             logFileCurrent = newFileName;
             outputStream = new FileOutputStream(logFileCurrent, true);
         } catch (Exception e) {
-            throw new Exception("adm log writer::output stream failed.", e);
+            throw new Exception("sniffer log writer::output stream failed.", e);
         }
     }
 
-    /**
-     * 文件检查、重建
-     *
-     * @throws IOException
-     */
     private static void checkCurrentFile() throws Exception {
         if (StringUtil.isEmpty(logFileCurrent)) {
             createLogFile();
@@ -93,12 +74,7 @@ public class LogWriter {
         }
     }
 
-    /**
-     * 写日志
-     *
-     * @param event
-     * @throws IOException
-     */
+
     public static void writelog(LogEvent event) throws Exception {
         String eventString = event.toString();
         //检查文件
@@ -109,9 +85,6 @@ public class LogWriter {
         System.out.println(eventString);
     }
 
-    /**
-     * 先清空再释放文件流
-     */
     public synchronized static void flushAndDispose() {
         try {
             if (outputStream != null) {

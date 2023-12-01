@@ -4,47 +4,16 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
-/**
- * com.zx.lib.utils
- *
- * @author xulibo
- * @version 2017/9/20
- */
 public class FileUtil {
-    /**
-     * 是否存在
-     *
-     * @param filePath
-     * @return
-     */
+
     public static boolean isExsit(String filePath) {
         File file = new File(filePath);
         return file.exists();
     }
 
-    /**
-     * 读取全文(按行)
-     *
-     * @param filePath
-     * @return
-     * @throws IOException
-     */
-    public static String readLines(String filePath) throws IOException {
-        if(!isExsit(filePath)){
-            return "";
-        }
-        return readLines(filePath, CharEncode.UTF_8);
-    }
 
-    /**
-     * 读取全文(按行)
-     *
-     * @param filePath
-     * @param encoding
-     * @return
-     * @throws IOException
-     */
     public static String readLines(String filePath, String encoding) throws IOException {
         File file = new File(filePath);
         StringBuilder sb = new StringBuilder();
@@ -87,7 +56,7 @@ public class FileUtil {
      * @return
      */
     public static long getSize(String filePath) {
-        if(!isExsit(filePath)){
+        if (!isExsit(filePath)) {
             return 0;
         }
         File file = new File(filePath);
@@ -130,7 +99,7 @@ public class FileUtil {
      * @return
      */
     public static boolean write(String filePath, String content, String encoding) throws IOException {
-        if(!isExsit(filePath)){
+        if (!isExsit(filePath)) {
             create(filePath);
         }
         FileOutputStream fileOut = null;
@@ -158,7 +127,7 @@ public class FileUtil {
      * @return
      */
     public static boolean write(String filePath, String content) throws IOException {
-        return write(filePath, content, CharEncode.UTF_8);
+        return write(filePath, content, StandardCharsets.UTF_8.name());
     }
 
     /**
@@ -169,7 +138,7 @@ public class FileUtil {
      * @return
      */
     public static boolean append(String filePath, String content, String encoding) throws IOException {
-        if(!isExsit(filePath)){
+        if (!isExsit(filePath)) {
             create(filePath);
         }
         FileOutputStream fileOut = null;
@@ -213,7 +182,7 @@ public class FileUtil {
      * @return
      */
     public static boolean append(String filePath, String content) throws IOException {
-        return append(filePath, content, CharEncode.UTF_8);
+        return append(filePath, content, StandardCharsets.UTF_8.name());
     }
 
     /**
@@ -239,7 +208,7 @@ public class FileUtil {
      * @return
      */
     public static boolean moveTo(String source, String target) throws IOException {
-        boolean res = copyTo(source,target);
+        boolean res = copyTo(source, target);
         delete(source);
         return res;
     }
@@ -252,7 +221,7 @@ public class FileUtil {
      * @return
      */
     public static boolean copyTo(String source, String target) throws IOException {
-        if(!isExsit(source)){
+        if (!isExsit(source)) {
             throw new IllegalArgumentException("source not exsits.");
         }
         create(target);
@@ -304,7 +273,7 @@ public class FileUtil {
      * @return
      */
     public static boolean delete(String filePath) {
-        if(isExsit(filePath)){
+        if (isExsit(filePath)) {
             File file = new File(filePath);
             file.delete();
         }

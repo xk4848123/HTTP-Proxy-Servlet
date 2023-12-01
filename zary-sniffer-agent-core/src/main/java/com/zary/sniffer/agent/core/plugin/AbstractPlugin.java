@@ -3,7 +3,6 @@ package com.zary.sniffer.agent.core.plugin;
 import com.zary.sniffer.agent.core.plugin.point.IConstructorPoint;
 import com.zary.sniffer.agent.core.plugin.point.IInstanceMethodPoint;
 import com.zary.sniffer.agent.core.plugin.point.IStaticMethodPoint;
-import lombok.Data;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 
@@ -12,12 +11,19 @@ import net.bytebuddy.matcher.ElementMatcher;
  *
  * @author xulibo 2019-12-12
  */
-@Data
 public abstract class AbstractPlugin {
     /**
      * 插件名称
      */
     private String pluginName;
+
+    public String getPluginName() {
+        return pluginName;
+    }
+
+    public void setPluginName(String pluginName) {
+        this.pluginName = pluginName;
+    }
 
     /**
      * 插件拦截的类筛选器(一个插件只有一个目标类过滤器，但是有多个拦截点)

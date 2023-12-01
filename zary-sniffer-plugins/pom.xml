@@ -12,17 +12,24 @@
     <artifactId>zary-sniffer-plugins</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>demo-plugin</module>
+        <module>springmvc-plugin</module>
+        <module>servlet-plugin-core</module>
+        <module>jdbc-plugin</module>
+        <module>servlet-plugin</module>
+        <module>plugin-common</module>
+        <module>httpclient-plugin</module>
+        <module>httpurl-plugin</module>
+        <module>struts2-plugin</module>
     </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- agent最终输出目录 -->
-        <agent.package.dir>${project.build.directory}/../../../zary-sniffer-x-packages/admx-agent</agent.package.dir>
+        <agent.package.dir>${project.build.directory}/../../../zary-sniffer-x-packages/sniffer-agent</agent.package.dir>
         <!-- agent最终输出目录下的plugins目录 -->
         <plugin.dir>${agent.package.dir}/plugins</plugin.dir>
         <!-- 第三方包重定向命名空间前缀 -->
-        <shade.package>com.zary.admx.agent.depencies</shade.package>
+        <shade.package>com.zary.sniffer.agent.depencies</shade.package>
     </properties>
     <!-- 插件全局依赖，但插件本身被agent动态加载，所以provided -->
     <dependencies>
@@ -32,8 +39,24 @@
             <version>1.0.1</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.zary</groupId>
+            <artifactId>zary-sniffer-transfer-wrapper</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zary</groupId>
+            <artifactId>zary-sniffer-config</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zary</groupId>
+            <artifactId>zary-sniffer-tracing</artifactId>
+            <version>1.0.1</version>
+        </dependency>
     </dependencies>
-    <!-- 插件包打包配置，实现下属插件统一打包并移动到zary-adm-agent输出目录指定位置 -->
+    <!-- 插件包打包配置，实现下属插件统一打包并移动到zary-sniffer-agent输出目录指定位置 -->
     <build>
         <plugins>
             <!-- 指定编译环境 -->
@@ -43,8 +66,8 @@
                 <version>3.8.0</version>
                 <configuration>
                     <skip>true</skip>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
             <!-- maven-shade-plugin打包为独立jar包 -->

@@ -1,0 +1,7 @@
+plugin.springmvc.dispatcher=com.zary.sniffer.agent.plugin.springmvc.DispatcherPlugin
+plugin.springmvc.gethandler=com.zary.sniffer.agent.plugin.springmvc.GetHandlerPlugin
+plugin.springmvc.viewrender=com.zary.sniffer.agent.plugin.springmvc.ViewRenderPlugin
+#plugin.springmvc.filter=com.zary.sniffer.agent.plugin.springmvc.OncePerRequestPlugin
+#plugin.springmvc.service=com.zary.sniffer.agent.plugin.springmvc.ServicePlugin
+#plugin.springmvc.controller=com.zary.sniffer.agent.plugin.springmvc.ControllerPlugin
+#plugin.springmvc.thymeleaf=com.zary.sniffer.agent.plugin.springmvc.ThymeleafPlugin

@@ -66,7 +66,7 @@ public class MethodHandler implements IInstanceMethodHandler {
         Tracer curTracer = TracerUtil.getCurTracer();
         Span span = curTracer.activeSpan();
         span.finish();
-        List<AdmxSpan> spans = ((AdmxTracer) curTracer).finishedSpans();
+        List<Span> spans = ((Tracer) curTracer).finishedSpans();
         LogUtil.info("spans", spans.toString());
 
         return returnValue;
@@ -144,7 +144,7 @@ public class MethodHandler implements IInstanceMethodHandler {
 在server端main方法中启动并订阅数据，定义接收回调处理
 ```java
 public static void main(String[] args) {
-    AgentServerStarter agentServerStarter = new AgentServerStarter();
+    AgentServerStarter defaultServerStarter = new AgentServerStarter();
 
     HandleManager handleManager = new HandleManager();
     AgentDataHandler agentDataHandler = new AgentDataHandler();
@@ -152,7 +152,7 @@ public static void main(String[] args) {
     //如果上报数据类型复杂可使用ParameterizedType自定义，这里的1对应插件端agentData.setType(1)
     handleManager.addHandler(1, Message2.class, agentDataHandler::handleMessage2);
 
-    agentServerStarter.start(handleManager);
+    defaultServerStarter.start(handleManager);
     
 
     }
@@ -175,6 +175,6 @@ public class AgentDataHandler {
 
 ## 打包部署
 
-mvn package后工程目录下会有zary-admx-x-packages目录，将plugins和zary-admx-xxx-agent.xxx.jar复制到需要执行的jar所在目录下
+mvn package后工程目录下会有zary-sniffer-x-packages目录，将plugins和zary-sniffer-xxx-agent.xxx.jar复制到需要执行的jar所在目录下
 
-执行java -javaagent:zary-admx-xxx-agent.xxx.jar -jar xxx.jar即可
+执行java -javaagent:zary-sniffer-xxx-agent.xxx.jar -jar xxx.jar即可

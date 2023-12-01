@@ -1,6 +1,6 @@
 package com.zary.sniffer.agent.core.plugin.loader;
 
-import com.zary.sniffer.agent.core.consts.AdmxAgentConsts;
+import com.zary.sniffer.agent.core.consts.CoreConsts;
 import com.zary.sniffer.agent.core.plugin.AbstractPlugin;
 import com.zary.sniffer.agent.core.plugin.PluginInfo;
 
@@ -26,7 +26,7 @@ public class PluginLoader {
      */
     public static List<URL> loadPluginDefineFiles(AgentClassLoader classLoader) throws IOException {
         List<URL> files = new ArrayList<URL>();
-        Enumeration<URL> enums = classLoader.getResources(AdmxAgentConsts.plugin_define_file);
+        Enumeration<URL> enums = classLoader.getResources(CoreConsts.PLUGIN_DEFINE_FILE);
         while (enums.hasMoreElements()) {
             URL pluginUrl = enums.nextElement();
             files.add(pluginUrl);

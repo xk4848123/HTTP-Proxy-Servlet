@@ -1,13 +1,10 @@
 package com.zary.sniffer.util;
 
-import org.apache.commons.lang3.time.DateUtils;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class DateUtil extends DateUtils {
-
+public class DateUtil {
     /**
      * 默认日期格式
      */
