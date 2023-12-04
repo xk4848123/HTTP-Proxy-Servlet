@@ -82,11 +82,17 @@ public class InstanceMethodMorphInterceptor {
                 returnValue = zuper.call(newArguments);
             }
         } catch (Throwable t) {
+            LogUtil.warn(String.format(
+                    "InstanceMethodMorphInterceptor::supercall failed.[%s.%s]",
+                    obj.getClass(),
+                    method.getName()
+            ), t);
+            //异常要继续抛出，防止上层调用根据异常驱动业务逻辑
+            throw t;
         } finally {
             /** 3.执行after */
             try {
-                Object newReturnValue = handler.onAfter(obj, method, newArguments, returnValue);
-                returnValue = newReturnValue;
+                handler.onAfter(obj, method, newArguments, returnValue);
                 LogUtil.debug("InstanceMethodMorphInterceptor::exit",
                         String.format("thread=%s,%nobj=%s,%nmethod=%s,%nallArguments=%s,%nreturnValue=%s",
                                 Thread.currentThread().getName(),

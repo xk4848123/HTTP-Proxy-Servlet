@@ -45,7 +45,7 @@ public class AgentStarter {
     }
 
     public void start(Instrumentation inst) {
-        start0(inst, LogLevel.INFO);
+        start0(inst, LogLevel.DEBUG);
     }
 
     private void start0(Instrumentation inst, LogLevel logLevel) {
@@ -69,7 +69,7 @@ public class AgentStarter {
         String configFile = executePath + File.separator + CoreConsts.AGENT_CONFIG;
         boolean isConfigExist = FileUtil.isExsit(configFile);
         if (!isConfigExist) {
-            throw new ConfigurationException("Could not find agent config file!");
+            throw new ConfigurationException("Could not find" + CoreConsts.AGENT_CONFIG + "in agent path");
         }
         Yaml yaml = new Yaml();
         FileInputStream fileInputStream = new FileInputStream(configFile);

@@ -20,6 +20,7 @@
         <module>httpclient-plugin</module>
         <module>httpurl-plugin</module>
         <module>struts2-plugin</module>
+        <module>test-plugin</module>
     </modules>
 
     <properties>
@@ -66,8 +67,8 @@
                 <version>3.8.0</version>
                 <configuration>
                     <skip>true</skip>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
             <!-- maven-shade-plugin打包为独立jar包 -->

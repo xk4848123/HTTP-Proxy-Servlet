@@ -85,12 +85,17 @@ public class InstanceMethodInterceptor {
                 returnValue = zuper.call();
             }
         } catch (Throwable t) {
-
+            LogUtil.warn(String.format(
+                    "InstanceMethodInterceptor::supercall failed.[%s.%s]",
+                    obj.getClass(),
+                    method.getName()
+            ), t);
+            //异常要继续抛出，防止上层调用根据异常驱动业务逻辑
+            throw t;
         } finally {
             /** 3.执行after */
             try {
-                Object newReturnValue = handler.onAfter(obj, method, allArguments, returnValue);
-                returnValue = newReturnValue;
+                handler.onAfter(obj, method, allArguments, returnValue);
                 //输出debug：排除ResultSetHandler调用太频繁
                 if (!handler.getClass().getName().contains("ResultSetHandler")) {
                     LogUtil.debug("InstanceMethodInterceptor::exit",

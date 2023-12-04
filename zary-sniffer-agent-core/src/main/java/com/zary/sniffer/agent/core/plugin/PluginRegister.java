@@ -59,17 +59,21 @@ public class PluginRegister {
         IInstanceMethodPoint[] instanceMethodPoints = plugin.getInstanceMethodPoints();
         if (instanceMethodPoints != null) {
             for (final IInstanceMethodPoint point : instanceMethodPoints) {
+                LogUtil.info("register instance method handle class", point.getHandlerClassName());
+
                 AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, javaModule) -> {
                     String handlerName = point.getHandlerClassName();
                     ElementMatcher<MethodDescription> methodMatcher = point.getMethodsMatcher();
                     boolean isMorph = point.isMorphArgs();
                     if (!isMorph) {//不需要带参数调用
                         builder = builder.method(methodMatcher).intercept(MethodDelegation.withDefaultConfiguration().to(new InstanceMethodInterceptor(handlerName, classLoader)));
+
                     } else {//需要带参数调用
                         builder = builder.method(methodMatcher).intercept(MethodDelegation.withDefaultConfiguration().withBinders(Morph.Binder.install(IMorphCall.class)).to(new InstanceMethodMorphInterceptor(handlerName, classLoader)));
                     }
                     return builder;
                 };
+
                 //符合条件的类使用transformer转换
                 agentBuilder.type(pluginTypeMatcher).transform(transformer);
             }

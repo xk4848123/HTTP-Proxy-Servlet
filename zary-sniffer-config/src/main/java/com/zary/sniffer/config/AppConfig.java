@@ -16,6 +16,30 @@ public class AppConfig {
     public AppConfig() {
     }
 
+    public void setAppid(String appid) {
+        this.appid = appid;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setAuthurl(String authurl) {
+        this.authurl = authurl;
+    }
+
+    public void setAuthkey(String authkey) {
+        this.authkey = authkey;
+    }
+
+    public void setSpace(String space) {
+        this.space = space;
+    }
+
     public String getAppid() {
         return appid;
     }
