@@ -114,12 +114,12 @@
                                     <shadedPattern>${shade.package}.com.lmax</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.apache.httpcomponents</pattern>
-                                    <shadedPattern>${shade.package}.org.apache.httpcomponents</shadedPattern>
+                                    <pattern>org.apache.http</pattern>
+                                    <shadedPattern>${shade.package}.org.apache.http</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.nutz</pattern>
-                                    <shadedPattern>${shade.package}.org.nutz</shadedPattern>
+                                    <pattern>org.yaml.snakeyaml</pattern>
+                                    <shadedPattern>${shade.package}.org.yaml.snakeyaml</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

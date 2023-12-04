@@ -144,7 +144,7 @@ public class MessageHandler {
             return true;
         } catch (Throwable t) {
             logger.error("data handle error:", t);
-            return true;
+            return false;
         }
     }
 

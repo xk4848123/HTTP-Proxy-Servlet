@@ -31,11 +31,7 @@ public class ServerMain {
     /**
      * 全局变量保存授权状态
      */
-    public static boolean AUTH_STATUS = false;
-    /**
-     * 全局变量是否结束进程
-     */
-    public static boolean ifStop = false;
+    public static volatile boolean AUTH_STATUS = false;
     /**
      * 配置文件参数
      */
