@@ -86,10 +86,12 @@ public class AgentStarter {
         AgentClassLoader classLoader = new AgentClassLoader(AgentStarter.class.getClassLoader(), new String[]{CoreConsts.PLUGIN_DIR});
         List<AbstractPlugin> plugins = PluginLoader.loadPlugins(classLoader);
         AgentBuilder agentBuilder = initAgentBuilder();
+
         ModuleExporter.export(inst, agentBuilder);
-        new PluginRegister().register(agentBuilder, plugins);
+        agentBuilder = new PluginRegister().register(agentBuilder, plugins);
         AgentBuilder.Listener listener = new DefaultAgentListener();
         agentBuilder.with(listener).installOn(inst);
+
         if (plugins.size() == 0) {
             LogUtil.error("agent load", "no plugin found");
         }
