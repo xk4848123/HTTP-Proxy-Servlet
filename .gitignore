@@ -32,3 +32,4 @@ obj/
 **/dependency-reduced-pom.xml
 /zary-sniffer-x-packages/sniffer-agent/sniffer-agent.tar
 /zary-sniffer-x-packages/sniffer-agent/sniffer-agent.tar.gz
+/zary-sniffer-x-packages/sniffer-agent/agentConfig.yml
