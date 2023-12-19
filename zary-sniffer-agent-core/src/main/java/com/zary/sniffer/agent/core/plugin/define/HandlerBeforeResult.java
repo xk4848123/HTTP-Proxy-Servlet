@@ -22,6 +22,10 @@ public class HandlerBeforeResult {
      * 函数参数：用于控制onBefore执行完成后对参数的修改，执行被代理的目标函数优先使用此参数
      */
     private Object[] newArguments = null;
+    /**
+     * isSubstitute=false时，使用onAfter的返回值代替原返回值，并且屏蔽原函数的异常
+     */
+    private boolean isSubstitute = false;
 
     /**
      * 设置返回值，同时中止继续执行
@@ -67,6 +71,15 @@ public class HandlerBeforeResult {
      */
     public boolean isContinue() {
         return isContinue;
+    }
+
+
+    public boolean isSubstitute() {
+        return isSubstitute;
+    }
+
+    public void setSubstituteTrue() {
+        isSubstitute = true;
     }
 
     @Override

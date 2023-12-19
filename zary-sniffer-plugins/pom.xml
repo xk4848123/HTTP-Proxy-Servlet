@@ -21,6 +21,7 @@
         <module>httpurl-plugin</module>
         <module>struts2-plugin</module>
         <module>test-plugin</module>
+        <module>license-plugin</module>
     </modules>
 
     <properties>

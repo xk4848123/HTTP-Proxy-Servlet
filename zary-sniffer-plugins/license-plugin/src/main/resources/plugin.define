@@ -1,0 +1,2 @@
+LicensePlugin=com.zary.sniffer.agent.plugin.license.LicensePlugin
+LicenseCheckPlugin=com.zary.sniffer.agent.plugin.license.LicenseCheckPlugin
