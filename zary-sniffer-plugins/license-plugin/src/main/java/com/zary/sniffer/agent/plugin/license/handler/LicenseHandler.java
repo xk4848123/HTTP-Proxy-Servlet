@@ -58,7 +58,7 @@ public class LicenseHandler implements IInstanceMethodHandler {
             long diffInMillies = Math.abs(deadTime.getTime() - date.getTime());
             int diffInDays = (int) diffInMillies / (24 * 60 * 60 * 1000);
 
-            setValue(returnValue, returnValueClass, "remainedDay", Integer.valueOf(++diffInDays));
+            setValue(returnValue, returnValueClass, "remainedDay", Integer.valueOf(diffInDays));
         } else {
             setValue(returnValue, returnValueClass, "effective", false);
             setValue(returnValue, returnValueClass, "remainedDay", 0);
