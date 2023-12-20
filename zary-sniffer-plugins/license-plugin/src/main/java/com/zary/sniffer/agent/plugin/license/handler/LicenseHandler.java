@@ -1,6 +1,5 @@
 package com.zary.sniffer.agent.plugin.license.handler;
 
-import com.zary.sniffer.agent.core.log.LogUtil;
 import com.zary.sniffer.agent.core.plugin.define.HandlerBeforeResult;
 import com.zary.sniffer.agent.core.plugin.handler.IInstanceMethodHandler;
 import com.zary.sniffer.agent.plugin.license.entity.LicenseInfox;
@@ -10,7 +9,6 @@ import com.zary.sniffer.util.ReflectUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -61,7 +59,7 @@ public class LicenseHandler implements IInstanceMethodHandler {
             return returnValue;
         }
 
-        Object res = execute("com.ambersec.cloud.common.utils.hardwareInfo.MachineCodeUtil", "getMachineCodeInTime", String.class, null);
+        Object res = ReflectUtil.execute("com.ambersec.cloud.common.utils.hardwareInfo.MachineCodeUtil", "getMachineCodeInTime", String.class, null);
         String machineCode = (String) res;
         if (machineCode != null) {
             if (!machineCode.equals(licenseInfox.getMachineCode())) {
@@ -99,24 +97,6 @@ public class LicenseHandler implements IInstanceMethodHandler {
         formatter.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         return date;
 
-    }
-
-    private static Object execute(String className, String methodName, Class<?> returnClazz, Object obj, Object... args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Class<?> executeClass = Class.forName(className);
-        Method[] methods = executeClass.getDeclaredMethods();
-        Method executeMethod = null;
-
-        for (Method method : methods) {
-            if (method.getName().equals("getMachineCodeInTime")) {
-                executeMethod = method;
-                break;
-            }
-        }
-        if (executeMethod == null) {
-            return null;
-        }
-        Object result = executeMethod.invoke(obj, args);
-        return result;
     }
 
 }
