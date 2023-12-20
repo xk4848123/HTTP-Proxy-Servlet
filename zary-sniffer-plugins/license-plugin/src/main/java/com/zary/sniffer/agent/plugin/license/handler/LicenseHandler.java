@@ -59,7 +59,7 @@ public class LicenseHandler implements IInstanceMethodHandler {
             return returnValue;
         }
 
-        Object res = ReflectUtil.execute("com.ambersec.cloud.common.utils.hardwareInfo.MachineCodeUtil", "getBizDir", String.class, null);
+        Object res = execute("com.ambersec.cloud.common.utils.hardwareInfo.MachineCodeUtil", "getMachineCodeInTime", String.class, null);
         String machineCode = (String) res;
         if (machineCode != null) {
             if (!machineCode.equals(licenseInfox.getMachineCode())) {
@@ -76,7 +76,7 @@ public class LicenseHandler implements IInstanceMethodHandler {
             long diffInMillies = Math.abs(deadTime.getTime() - date.getTime());
             int diffInDays = (int) diffInMillies / (24 * 60 * 60 * 1000);
 
-            setValue(returnValue, returnValueClass, "remainedDay", diffInDays);
+            setValue(returnValue, returnValueClass, "remainedDay", Integer.valueOf(diffInDays));
         } else {
             setValue(returnValue, returnValueClass, "effective", false);
             setValue(returnValue, returnValueClass, "remainedDay", 0);
@@ -97,6 +97,14 @@ public class LicenseHandler implements IInstanceMethodHandler {
         formatter.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         return date;
 
+    }
+
+    private static Object execute(String className, String methodName, Class<?> returnClazz, Object obj, Object... args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Class<?> executeClass = Class.forName(className);
+        Method executeMethod = executeClass.getDeclaredMethod(methodName, returnClazz);
+        executeMethod.setAccessible(true);
+        Object result = executeMethod.invoke(obj, args);
+        return result;
     }
 
 }
