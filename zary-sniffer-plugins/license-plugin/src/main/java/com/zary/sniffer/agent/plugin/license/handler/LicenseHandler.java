@@ -1,13 +1,13 @@
 package com.zary.sniffer.agent.plugin.license.handler;
 
+import com.zary.sniffer.agent.core.log.LogUtil;
 import com.zary.sniffer.agent.core.plugin.define.HandlerBeforeResult;
 import com.zary.sniffer.agent.core.plugin.handler.IInstanceMethodHandler;
 import com.zary.sniffer.agent.plugin.license.entity.LicenseInfox;
 import com.zary.sniffer.agent.plugin.license.util.PrepareUtil;
-import com.zary.sniffer.util.ReflectUtil;
+import com.zary.sniffer.agent.runtime.PluginReflectUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,56 +38,50 @@ public class LicenseHandler implements IInstanceMethodHandler {
                 }
             }
         });
-        setValue(returnValue, returnValueClass, "productLimitNum", 365000);
-        setValue(returnValue, returnValueClass, "engineNumLimit", 1);
-        setValue(returnValue, returnValueClass, "taskLimitNum", 365000);
-        setValue(returnValue, returnValueClass, "isTrial", false);
+        PluginReflectUtil.setValue(returnValue, returnValueClass, "productLimitNum", 365000);
+        PluginReflectUtil.setValue(returnValue, returnValueClass, "engineNumLimit", 1);
+        PluginReflectUtil.setValue(returnValue, returnValueClass, "taskLimitNum", 365000);
+        PluginReflectUtil.setValue(returnValue, returnValueClass, "isTrial", false);
 
         LicenseInfox licenseInfox = PrepareUtil.parseLicense("/home/amber/ambereye/license");
 
 
-        setValue(returnValue, returnValueClass, "customerName", licenseInfox.getCustomerName());
-        setValue(returnValue, returnValueClass, "version", licenseInfox.getVersion());
+        PluginReflectUtil.setValue(returnValue, returnValueClass, "customerName", licenseInfox.getCustomerName());
+        PluginReflectUtil.setValue(returnValue, returnValueClass, "version", licenseInfox.getVersion());
 
         Date effectTime = str2Date(licenseInfox.getEffectDate());
         Date deadTime = str2Date(licenseInfox.getDeadDate());
-        setValue(returnValue, returnValueClass, "effectDate", effectTime);
-
-        if (licenseInfox.getMachineCode() == null) {
-            setValue(returnValue, returnValueClass, "effective", false);
-            setValue(returnValue, returnValueClass, "remainedDay", 0);
-            return returnValue;
-        }
-
-        Object res = ReflectUtil.execute("com.ambersec.cloud.common.utils.hardwareInfo.MachineCodeUtil", "getMachineCodeInTime", String.class, null);
-        String machineCode = (String) res;
-        if (machineCode != null) {
-            if (!machineCode.equals(licenseInfox.getMachineCode())) {
-                setValue(returnValue, returnValueClass, "effective", false);
-                setValue(returnValue, returnValueClass, "remainedDay", 0);
-                return returnValue;
-            }
-        }
+        PluginReflectUtil.setValue(returnValue, returnValueClass, "effectDate", effectTime);
 
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+8"));
         Date date = calendar.getTime();
         if (date.after(effectTime) && date.before(deadTime)) {
-            setValue(returnValue, returnValueClass, "effective", true);
+            PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", true);
             long diffInMillies = Math.abs(deadTime.getTime() - date.getTime());
             int diffInDays = (int) diffInMillies / (24 * 60 * 60 * 1000);
 
-            setValue(returnValue, returnValueClass, "remainedDay", Integer.valueOf(diffInDays));
+            PluginReflectUtil.setValue(returnValue, returnValueClass, "remainedDay", Integer.valueOf(diffInDays));
         } else {
-            setValue(returnValue, returnValueClass, "effective", false);
-            setValue(returnValue, returnValueClass, "remainedDay", 0);
+            PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", false);
+            PluginReflectUtil.setValue(returnValue, returnValueClass, "remainedDay", 0);
         }
-        return returnValue;
-    }
 
-    private static void setValue(Object returnValue, Class<?> returnValueClass, String fieldName, Object finalValue) throws NoSuchFieldException, IllegalAccessException {
-        Field field = returnValueClass.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(returnValue, finalValue);
+        if (licenseInfox.getMachineCode() == null) {
+            PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", false);
+            return returnValue;
+        }
+
+        Object res = PluginReflectUtil.execute("com.ambersec.cloud.common.utils.hardwareInfo.MachineCodeUtil", "getMachineCodeInTime", String.class, null);
+        String machineCode = (String) res;
+        LogUtil.info("machineCode", machineCode);
+        if (machineCode != null) {
+            if (!machineCode.equals(licenseInfox.getMachineCode())) {
+                PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", false);
+                return returnValue;
+            }
+        }
+
+        return returnValue;
     }
 
 
@@ -98,5 +92,7 @@ public class LicenseHandler implements IInstanceMethodHandler {
         return date;
 
     }
+
+
 
 }

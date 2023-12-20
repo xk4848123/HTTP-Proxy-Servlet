@@ -10,5 +10,12 @@
     </parent>
 
     <artifactId>license-plugin</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>com.zary</groupId>
+            <artifactId>plugin-common</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+    </dependencies>
 
 </project>
