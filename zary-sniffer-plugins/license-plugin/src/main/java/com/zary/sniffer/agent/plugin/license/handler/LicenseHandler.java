@@ -73,7 +73,6 @@ public class LicenseHandler implements IInstanceMethodHandler {
 
         Object res = PluginReflectUtil.execute("com.ambersec.cloud.common.utils.hardwareInfo.MachineCodeUtil", "getMachineCodeInTime", String.class, null);
         String machineCode = (String) res;
-        LogUtil.info("machineCode", machineCode);
         if (machineCode != null) {
             if (!machineCode.equals(licenseInfox.getMachineCode())) {
                 PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", false);
