@@ -58,9 +58,9 @@ public class LicenseHandler implements IInstanceMethodHandler {
         if (date.after(effectTime) && date.before(deadTime)) {
             PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", true);
             long diffInMillies = Math.abs(deadTime.getTime() - date.getTime());
-            int diffInDays = (int) diffInMillies / (24 * 60 * 60 * 1000);
+            int diffInDays = (int) (diffInMillies / (24 * 60 * 60 * 1000));
 
-            PluginReflectUtil.setValue(returnValue, returnValueClass, "remainedDay", Integer.valueOf(diffInDays));
+            PluginReflectUtil.setValue(returnValue, returnValueClass, "remainedDay", diffInDays);
         } else {
             PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", false);
             PluginReflectUtil.setValue(returnValue, returnValueClass, "remainedDay", 0);
@@ -91,7 +91,6 @@ public class LicenseHandler implements IInstanceMethodHandler {
         return date;
 
     }
-
 
 
 }
