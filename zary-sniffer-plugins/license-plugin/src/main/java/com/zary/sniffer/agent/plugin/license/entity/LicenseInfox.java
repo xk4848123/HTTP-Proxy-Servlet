@@ -10,6 +10,16 @@ public class LicenseInfox {
 
     private String version;
 
+    public String getMachineCode() {
+        return machineCode;
+    }
+
+    public void setMachineCode(String machineCode) {
+        this.machineCode = machineCode;
+    }
+
+    private String machineCode;
+
 
     public String getEffectDate() {
         return effectDate;

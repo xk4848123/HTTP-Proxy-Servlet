@@ -4,8 +4,10 @@ import com.zary.sniffer.agent.core.plugin.define.HandlerBeforeResult;
 import com.zary.sniffer.agent.core.plugin.handler.IInstanceMethodHandler;
 import com.zary.sniffer.agent.plugin.license.entity.LicenseInfox;
 import com.zary.sniffer.agent.plugin.license.util.PrepareUtil;
+import com.zary.sniffer.util.ReflectUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -51,6 +53,22 @@ public class LicenseHandler implements IInstanceMethodHandler {
         Date deadTime = str2Date(licenseInfox.getDeadDate());
         setValue(returnValue, returnValueClass, "effectDate", effectTime);
 
+        if (licenseInfox.getMachineCode() == null) {
+            setValue(returnValue, returnValueClass, "effective", false);
+            setValue(returnValue, returnValueClass, "remainedDay", 0);
+            return returnValue;
+        }
+
+        Object res = ReflectUtil.execute("com.ambersec.cloud.common.utils.hardwareInfo.MachineCodeUtil", "getBizDir", String.class, null);
+        String machineCode = (String) res;
+        if (machineCode != null) {
+            if (!machineCode.equals(licenseInfox.getMachineCode())) {
+                setValue(returnValue, returnValueClass, "effective", false);
+                setValue(returnValue, returnValueClass, "remainedDay", 0);
+                return returnValue;
+            }
+        }
+
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+8"));
         Date date = calendar.getTime();
         if (date.after(effectTime) && date.before(deadTime)) {
@@ -58,7 +76,7 @@ public class LicenseHandler implements IInstanceMethodHandler {
             long diffInMillies = Math.abs(deadTime.getTime() - date.getTime());
             int diffInDays = (int) diffInMillies / (24 * 60 * 60 * 1000);
 
-            setValue(returnValue, returnValueClass, "remainedDay", Integer.valueOf(diffInDays));
+            setValue(returnValue, returnValueClass, "remainedDay", diffInDays);
         } else {
             setValue(returnValue, returnValueClass, "effective", false);
             setValue(returnValue, returnValueClass, "remainedDay", 0);
