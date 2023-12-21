@@ -29,15 +29,6 @@ public class LicenseHandler implements IInstanceMethodHandler {
         statusField.setAccessible(true);
         Object statusObject = statusField.get(returnValue);
 
-        EnumSet.allOf((Class<Enum>) statusObject.getClass()).forEach(e -> {
-            if (e.toString().equals("NORMAL")) {
-                try {
-                    statusField.set(returnValue, e);
-                } catch (IllegalAccessException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-        });
         PluginReflectUtil.setValue(returnValue, returnValueClass, "productLimitNum", 365000);
         PluginReflectUtil.setValue(returnValue, returnValueClass, "engineNumLimit", 1);
         PluginReflectUtil.setValue(returnValue, returnValueClass, "taskLimitNum", 365000);
@@ -45,6 +36,23 @@ public class LicenseHandler implements IInstanceMethodHandler {
 
         LicenseInfox licenseInfox = PrepareUtil.parseLicense("/home/amber/ambereye/license");
 
+        if (licenseInfox == null) {
+            PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", false);
+            PluginReflectUtil.setValue(returnValue, returnValueClass, "remainedDay", -1);
+            EnumSet.allOf((Class<Enum>) statusObject.getClass()).forEach(e -> {
+                if (e.toString().equals("INVALID")) {
+                    try {
+                        statusField.set(returnValue, e);
+                    } catch (IllegalAccessException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            });
+            PluginReflectUtil.setValue(returnValue, returnValueClass, "customerName", "未知");
+            PluginReflectUtil.setValue(returnValue, returnValueClass, "version", "未知");
+            PluginReflectUtil.setValue(returnValue, returnValueClass, "effectDate", new Date());
+            return returnValue;
+        }
 
         PluginReflectUtil.setValue(returnValue, returnValueClass, "customerName", licenseInfox.getCustomerName());
         PluginReflectUtil.setValue(returnValue, returnValueClass, "version", licenseInfox.getVersion());
@@ -55,31 +63,54 @@ public class LicenseHandler implements IInstanceMethodHandler {
 
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+8"));
         Date date = calendar.getTime();
+
         if (date.after(effectTime) && date.before(deadTime)) {
-            PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", true);
+
             long diffInMillies = Math.abs(deadTime.getTime() - date.getTime());
             int diffInDays = (int) (diffInMillies / (24 * 60 * 60 * 1000));
 
             PluginReflectUtil.setValue(returnValue, returnValueClass, "remainedDay", diffInDays);
         } else {
             PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", false);
-            PluginReflectUtil.setValue(returnValue, returnValueClass, "remainedDay", 0);
-        }
-
-        if (licenseInfox.getMachineCode() == null) {
-            PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", false);
+            PluginReflectUtil.setValue(returnValue, returnValueClass, "remainedDay", -1);
+            EnumSet.allOf((Class<Enum>) statusObject.getClass()).forEach(e -> {
+                if (e.toString().equals("EXPIRED")) {
+                    try {
+                        statusField.set(returnValue, e);
+                    } catch (IllegalAccessException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            });
             return returnValue;
         }
 
         Object res = PluginReflectUtil.execute("com.ambersec.cloud.common.utils.hardwareInfo.MachineCodeUtil", "getMachineCodeInTime", String.class, null);
         String machineCode = (String) res;
-        if (machineCode != null) {
-            if (!machineCode.equals(licenseInfox.getMachineCode())) {
-                PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", false);
-                return returnValue;
-            }
+        if (licenseInfox.getMachineCode() == null || machineCode == null || !licenseInfox.getMachineCode().equals(machineCode)) {
+            PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", false);
+            EnumSet.allOf((Class<Enum>) statusObject.getClass()).forEach(e -> {
+                if (e.toString().equals("NOT_EFFECTIVE")) {
+                    try {
+                        statusField.set(returnValue, e);
+                    } catch (IllegalAccessException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            });
+            return returnValue;
         }
 
+        PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", true);
+        EnumSet.allOf((Class<Enum>) statusObject.getClass()).forEach(e -> {
+            if (e.toString().equals("NORMAL")) {
+                try {
+                    statusField.set(returnValue, e);
+                } catch (IllegalAccessException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
         return returnValue;
     }
 
