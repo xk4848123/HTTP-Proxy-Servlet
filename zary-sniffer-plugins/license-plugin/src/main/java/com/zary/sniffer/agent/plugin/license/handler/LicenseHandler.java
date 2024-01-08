@@ -90,7 +90,7 @@ public class LicenseHandler implements IInstanceMethodHandler {
         if (licenseInfox.getMachineCode() == null || machineCode == null || !licenseInfox.getMachineCode().equals(machineCode)) {
             PluginReflectUtil.setValue(returnValue, returnValueClass, "effective", false);
             EnumSet.allOf((Class<Enum>) statusObject.getClass()).forEach(e -> {
-                if (e.toString().equals("NOT_EFFECTIVE")) {
+                if (e.toString().equals("INVALID")) {
                     try {
                         statusField.set(returnValue, e);
                     } catch (IllegalAccessException ex) {
