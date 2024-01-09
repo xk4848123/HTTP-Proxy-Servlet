@@ -22,7 +22,6 @@ import org.yaml.snakeyaml.Yaml;
 import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.util.List;

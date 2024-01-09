@@ -32,7 +32,6 @@ public class Config {
     private String socketTimeout;
 
     /**
-     *
      * 设置套接字读取超时时间（毫秒）
      */
     private String readTimeout;
@@ -57,6 +56,10 @@ public class Config {
      */
     private String handleCompression;
 
+    /**
+     * 去掉匹配的父路径，如:/index/a匹配到/index/*，去掉/index,实际uri成/a
+     */
+    private String stripPrefix;
 
     public Map<String, String> getPattern2TargetUrlList() {
         return pattern2TargetUrlList;
@@ -144,5 +147,13 @@ public class Config {
 
     public void setHandleCompression(String handleCompression) {
         this.handleCompression = handleCompression;
+    }
+
+    public String getStripPrefix() {
+        return stripPrefix;
+    }
+
+    public void setStripPrefix(String stripPrefix) {
+        this.stripPrefix = stripPrefix;
     }
 }

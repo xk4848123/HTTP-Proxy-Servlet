@@ -72,6 +72,7 @@ public class HttpProxy implements Closeable {
     protected int connectionRequestTimeout = -1;
     protected int maxConnections = -1;
 
+    protected boolean stripPrefix = false;
     private Map<String, Target> targetMap;
 
     private HttpClient proxyClient;
@@ -139,6 +140,11 @@ public class HttpProxy implements Closeable {
         String doHandleCompression = ConfigCache.getConfig().getHandleCompression();
         if (doHandleCompression != null) {
             this.doHandleCompression = Boolean.parseBoolean(doHandleCompression);
+        }
+
+        String stripPrefix = ConfigCache.getConfig().getStripPrefix();
+        if (stripPrefix != null) {
+            this.stripPrefix = Boolean.parseBoolean(stripPrefix);
         }
 
         initTarget();
@@ -231,15 +237,24 @@ public class HttpProxy implements Closeable {
 
     RequestTarget extractUri(String uri) {
         for (String pattern : targetMap.keySet()) {
+            if (!pattern.contains("*") && uri.equals(pattern)) {
+                return new RequestTarget(targetMap.get(pattern).getTargetUrlBase(), targetMap.get(pattern).getTargetUrlBase() + uri, targetMap.get(pattern).getTargetHost());
+            }
             String regex = pattern.replace("*", "(.*)");
             Pattern p = Pattern.compile(regex);
             Matcher m = p.matcher(uri);
             if (m.matches() && m.groupCount() > 0) {
-                String partUri = m.group(1);
+                String partUri;
+                if (stripPrefix) {
+                    partUri = "/" + m.group(1);
+                } else {
+                    partUri = uri;
+                }
+
                 if ("".equals(partUri)) {
                     return new RequestTarget(targetMap.get(pattern).getTargetUrlBase(), targetMap.get(pattern).getTargetUrlBase() + "/", targetMap.get(pattern).getTargetHost());
                 }
-                return new RequestTarget(targetMap.get(pattern).getTargetUrlBase(), targetMap.get(pattern).getTargetUrlBase() + "/" + encodeUriQuery(partUri, true), targetMap.get(pattern).getTargetHost());
+                return new RequestTarget(targetMap.get(pattern).getTargetUrlBase(), targetMap.get(pattern).getTargetUrlBase() + encodeUriQuery(partUri, true), targetMap.get(pattern).getTargetHost());
             }
         }
         return null;
