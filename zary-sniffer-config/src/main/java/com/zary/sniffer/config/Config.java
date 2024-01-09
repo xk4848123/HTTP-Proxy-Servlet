@@ -1,157 +1,148 @@
 package com.zary.sniffer.config;
 
-import com.zary.sniffer.util.RegexUtil;
-import com.zary.sniffer.util.StringUtil;
-
-import java.util.List;
+import java.util.Map;
 
 public class Config {
 
-    private String instance;
+    private Map<String, String> pattern2TargetUrlList;
 
-    private String env;
+    /**
+     * 标识客户端IP转发
+     */
+    private String forwardIp;
 
-    private String token;
+    /**
+     * 是否保持HOST参数原样
+     */
+    private String preserveHost;
 
-    private String server;
+    /**
+     * 是否保持COOKIES不变
+     */
+    private String preserveCookies;
 
-    private boolean auto_script;
+    /**
+     * 是否自动处理重定向
+     */
+    private String handleRedirects;
 
-    private String auto_pass;
+    /**
+     * 设置套接字连接超时时间（毫秒）
+     */
+    private String socketTimeout;
 
-    private boolean open_span;
+    /**
+     *
+     * 设置套接字读取超时时间（毫秒）
+     */
+    private String readTimeout;
 
-    private List<AppConfig> apps;
+    /**
+     * 设置连接请求超时时间（毫秒）
+     */
+    private String connectionRequestTimeout;
 
-    private String script;
+    /**
+     * 设置最大连接数
+     */
+    private String maxConnections;
 
-    public Config() {
+    /**
+     * 是否使用JVM定义的系统属性来配置。
+     */
+    private String useSystemProperties;
+
+    /**
+     * 是否在servlet中处理压缩
+     */
+    private String handleCompression;
+
+
+    public Map<String, String> getPattern2TargetUrlList() {
+        return pattern2TargetUrlList;
     }
 
-    public String getInstance() {
-        return instance;
+    public void setPattern2TargetUrlList(Map<String, String> pattern2TargetUrlList) {
+        this.pattern2TargetUrlList = pattern2TargetUrlList;
     }
 
-    public void setInstance(String instance) {
-        this.instance = instance;
+    public String getForwardIp() {
+        return forwardIp;
     }
 
-    public String getEnv() {
-        return env;
+    public void setForwardIp(String forwardIp) {
+        this.forwardIp = forwardIp;
     }
 
-    public void setEnv(String env) {
-        this.env = env;
+    public String getPreserveHost() {
+        return preserveHost;
     }
 
-    public String getToken() {
-        return token;
+    public void setPreserveHost(String preserveHost) {
+        this.preserveHost = preserveHost;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public String getPreserveCookies() {
+        return preserveCookies;
     }
 
-    public String getServer() {
-        return server;
+    public void setPreserveCookies(String preserveCookies) {
+        this.preserveCookies = preserveCookies;
     }
 
-    public void setServer(String server) {
-        this.server = server;
+    public String getHandleRedirects() {
+        return handleRedirects;
     }
 
-    public boolean isAuto_script() {
-        return auto_script;
+    public void setHandleRedirects(String handleRedirects) {
+        this.handleRedirects = handleRedirects;
     }
 
-    public void setAuto_script(boolean auto_script) {
-        this.auto_script = auto_script;
+    public String getSocketTimeout() {
+        return socketTimeout;
     }
 
-    public String getAuto_pass() {
-        return auto_pass;
+    public void setSocketTimeout(String socketTimeout) {
+        this.socketTimeout = socketTimeout;
     }
 
-    public void setAuto_pass(String auto_pass) {
-        this.auto_pass = auto_pass;
+    public String getReadTimeout() {
+        return readTimeout;
     }
 
-    public boolean isOpen_span() {
-        return open_span;
+    public void setReadTimeout(String readTimeout) {
+        this.readTimeout = readTimeout;
     }
 
-    public void setOpen_span(boolean open_span) {
-        this.open_span = open_span;
+    public String getConnectionRequestTimeout() {
+        return connectionRequestTimeout;
     }
 
-    public List<AppConfig> getApps() {
-        return apps;
+    public void setConnectionRequestTimeout(String connectionRequestTimeout) {
+        this.connectionRequestTimeout = connectionRequestTimeout;
     }
 
-    public void setApps(List<AppConfig> apps) {
-        this.apps = apps;
+    public String getMaxConnections() {
+        return maxConnections;
     }
 
-    public String getScript() {
-        return script;
+    public void setMaxConnections(String maxConnections) {
+        this.maxConnections = maxConnections;
     }
 
-    public void setScript(String script) {
-        this.script = script;
+    public String getUseSystemProperties() {
+        return useSystemProperties;
     }
 
-    public boolean isValid() {
-        if (instance == null || instance.length() == 0) {
-            return false;
-        }
-        if (token == null || token.length() == 0) {
-            return false;
-        }
-        if (apps == null) {
-            return false;
-        }
-        if (server == null || server.length() == 0) {
-            return false;
-        }
-        for (AppConfig app : apps) {
-            if (!app.isValid()) {
-                return false;
-            }
-        }
-        return true;
+    public void setUseSystemProperties(String useSystemProperties) {
+        this.useSystemProperties = useSystemProperties;
     }
 
-    public String getAppid(String clsname) {
-        if (clsname == null || clsname.length() == 0 || apps == null || apps.size() == 0) {
-            return "";
-        }
-        for (AppConfig app : apps) {
-            String[] appSpaces = app.getSpace().split(",");
-            if (appSpaces != null) {
-                for (String appSpace : appSpaces) {
-                    if (clsname.startsWith(appSpace)) {
-                        return app.getAppid();
-                    }
-                }
-            }
-        }
-        return "";
+    public String getHandleCompression() {
+        return handleCompression;
     }
 
-    public boolean isAutoPass(String url) {
-        try {
-            String auto_pass = this.auto_pass;
-            if (StringUtil.isNotEmpty(auto_pass)) {
-                String[] arrs = auto_pass.split(",");
-                for (String item : arrs) {
-                    if (StringUtil.isNotEmpty(item) && RegexUtil.matchs(item, url).size() > 0) {
-                        return true;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
+    public void setHandleCompression(String handleCompression) {
+        this.handleCompression = handleCompression;
     }
 }

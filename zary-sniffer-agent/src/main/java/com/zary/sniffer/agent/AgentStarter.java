@@ -11,7 +11,6 @@ import com.zary.sniffer.agent.core.plugin.loader.AgentClassLoader;
 import com.zary.sniffer.agent.core.plugin.loader.PluginLoader;
 import com.zary.sniffer.config.Config;
 import com.zary.sniffer.config.ConfigCache;
-import com.zary.sniffer.transfer.TransferDataUtil;
 import com.zary.sniffer.util.FileUtil;
 import com.zary.sniffer.util.SystemUtil;
 import net.bytebuddy.ByteBuddy;
@@ -23,6 +22,7 @@ import org.yaml.snakeyaml.Yaml;
 import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.util.List;
@@ -45,7 +45,7 @@ public class AgentStarter {
     }
 
     public void start(Instrumentation inst) {
-        start0(inst, LogLevel.INFO);
+        start0(inst, LogLevel.DEBUG);
     }
 
     private void start0(Instrumentation inst, LogLevel logLevel) {
@@ -56,8 +56,6 @@ public class AgentStarter {
 
             logStart(logLevel);
 
-            dataCollectStart(ConfigCache.get().getServer(), ConfigCache.get().getToken());
-
             agentStart(inst);
         } catch (Throwable t) {
             t.printStackTrace();
@@ -65,7 +63,7 @@ public class AgentStarter {
     }
 
     private static void initConfig() throws Exception {
-        String executePath = SystemUtil.getExcutePath();
+        String executePath = SystemUtil.getExecutePath();
         String configFile = executePath + File.separator + CoreConsts.AGENT_CONFIG;
         boolean isConfigExist = FileUtil.isExsit(configFile);
         if (!isConfigExist) {
@@ -97,12 +95,8 @@ public class AgentStarter {
         }
     }
 
-    private static void dataCollectStart(String address, String token) {
-        TransferDataUtil.start(address, token);
-    }
-
     private static void logStart(LogLevel logLevel) throws Exception {
-        String excutePath = SystemUtil.getExcutePath();
+        String excutePath = SystemUtil.getExecutePath();
         LogUtil.start(excutePath + File.separator + "logs", FILE_MAX_SIZE, logLevel);
     }
 

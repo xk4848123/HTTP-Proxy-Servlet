@@ -1,1 +1,0 @@
-plugin.okhttp3.clientcall=com.zary.sniffer.agent.plugin.okhttp3.OkHttpClientCallPlugin

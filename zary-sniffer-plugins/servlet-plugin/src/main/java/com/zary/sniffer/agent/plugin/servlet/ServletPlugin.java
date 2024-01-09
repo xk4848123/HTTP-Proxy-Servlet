@@ -1,7 +1,6 @@
 package com.zary.sniffer.agent.plugin.servlet;
 
 
-import com.zary.sniffer.config.PluginConsts;
 import com.zary.sniffer.agent.core.plugin.AbstractPlugin;
 import com.zary.sniffer.agent.core.plugin.point.IConstructorPoint;
 import com.zary.sniffer.agent.core.plugin.point.IInstanceMethodPoint;
@@ -21,15 +20,10 @@ public class ServletPlugin extends AbstractPlugin {
 
     @Override
     public ElementMatcher<TypeDescription> getPluginTypeMatcher() {
+
         return ElementMatchers.hasSuperClass(ElementMatchers.<TypeDescription>named("javax.servlet.http.HttpServlet"))
                 .and(ElementMatchers.not(ElementMatchers.isInterface()))
-                .and(ElementMatchers.not(ElementMatchers.<TypeDescription>isAbstract()))
-                .and(ElementMatchers.not(ElementMatchers.<TypeDescription>nameEndsWith("DispatcherServlet")))
-                .and(ElementMatchers.not(ElementMatchers.<TypeDescription>nameStartsWith(PluginConsts.PKG_JAVA_SUN)))
-                .and(ElementMatchers.not(ElementMatchers.<TypeDescription>nameStartsWith("org.apache.")))
-                .and(ElementMatchers.not(ElementMatchers.<TypeDescription>nameStartsWith("org.eclipse.")))
-                .and(ElementMatchers.not(ElementMatchers.<TypeDescription>nameStartsWith("org.springframework.")))
-                .and(ElementMatchers.not(ElementMatchers.<TypeDescription>nameStartsWith("javax.")));
+                .and(ElementMatchers.not(ElementMatchers.isAbstract()));
     }
 
     @Override
@@ -49,8 +43,6 @@ public class ServletPlugin extends AbstractPlugin {
                         .and(
                                 ElementMatchers.<MethodDescription>named("service")
                         );
-//                .or(ElementMatchers.<MethodDescription>named("doGet"))
-//                        .or(ElementMatchers.<MethodDescription>named("doPost"))
             }
 
             @Override

@@ -14,12 +14,12 @@ public class SystemUtil {
      * @return classes目录或jar包所在目录
      * @throws Exception
      */
-    public static String getExcutePath() throws Exception {
+    public static String getExecutePath() throws Exception {
         ProtectionDomain protectionDomain = SystemUtil.class.getProtectionDomain();
-        return getExcutePath(protectionDomain);
+        return getExecutePath(protectionDomain);
     }
 
-    public static String getExcutePath(ProtectionDomain protectionDomain) throws URISyntaxException {
+    public static String getExecutePath(ProtectionDomain protectionDomain) throws URISyntaxException {
         CodeSource codeSource = protectionDomain.getCodeSource();
         URI location = (codeSource == null ? null : codeSource.getLocation().toURI());
         String path = (location == null ? null : location.getSchemeSpecificPart());

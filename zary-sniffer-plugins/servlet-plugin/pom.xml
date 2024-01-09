@@ -12,12 +12,12 @@
     <artifactId>servlet-plugin</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>com.zary</groupId>
-            <artifactId>servlet-plugin-core</artifactId>
-            <version>1.0.1</version>
-        </dependency>
         <!--servlet版本：java5(v3.0.1+),java7(v3.1-b03+),java8(v4.0.0-b01+)-->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.13</version>
+        </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>

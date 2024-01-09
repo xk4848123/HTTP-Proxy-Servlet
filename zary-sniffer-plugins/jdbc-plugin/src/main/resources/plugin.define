@@ -1,5 +1,0 @@
-#plugin.jdbc.conn=com.zary.sniffer.agent.plugin.jdbc.ConnectionPlugin
-plugin.jdbc.statement=com.zary.sniffer.agent.plugin.jdbc.StatementPlugin
-plugin.jdbc.preparedstatement=com.zary.sniffer.agent.plugin.jdbc.PreparedStatementPlugin
-plugin.jdbc.callablestatement=com.zary.sniffer.agent.plugin.jdbc.CallableStatementPlugin
-plugin.jdbc.resultset=com.zary.sniffer.agent.plugin.jdbc.ResultSetPlugin

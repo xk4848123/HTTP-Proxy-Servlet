@@ -12,16 +12,7 @@
     <artifactId>zary-sniffer-plugins</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>springmvc-plugin</module>
-        <module>servlet-plugin-core</module>
-        <module>jdbc-plugin</module>
         <module>servlet-plugin</module>
-        <module>plugin-common</module>
-        <module>httpclient-plugin</module>
-        <module>httpurl-plugin</module>
-        <module>struts2-plugin</module>
-        <module>test-plugin</module>
-        <module>license-plugin</module>
     </modules>
 
     <properties>
@@ -41,20 +32,10 @@
             <version>1.0.1</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.zary</groupId>
-            <artifactId>zary-sniffer-transfer-wrapper</artifactId>
-            <version>1.0.1</version>
-        </dependency>
 
         <dependency>
             <groupId>com.zary</groupId>
             <artifactId>zary-sniffer-config</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.zary</groupId>
-            <artifactId>zary-sniffer-tracing</artifactId>
             <version>1.0.1</version>
         </dependency>
     </dependencies>

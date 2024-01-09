@@ -41,7 +41,7 @@ public class AgentClassLoader extends ClassLoader {
         String root = "";
         jarDirPaths = new ArrayList<File>();
         try {
-            root = SystemUtil.getExcutePath(AgentClassLoader.class.getProtectionDomain());
+            root = SystemUtil.getExecutePath(AgentClassLoader.class.getProtectionDomain());
             for (String dir : dirs) {
                 jarDirPaths.add(new File(root + "/" + dir));
             }

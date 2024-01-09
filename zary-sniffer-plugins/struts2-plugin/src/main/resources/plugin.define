@@ -1,8 +1,0 @@
-plugin.struts2.executeoperations=com.zary.sniffer.agent.plugin.struts2.ExecuteOperationsPlugin
-plugin.struts2.dispatcher=com.zary.sniffer.agent.plugin.struts2.DispatcherPlugin
-plugin.struts2.actionsupport=com.zary.sniffer.agent.plugin.struts2.ActionSupportPlugin
-
-
-
-
-
