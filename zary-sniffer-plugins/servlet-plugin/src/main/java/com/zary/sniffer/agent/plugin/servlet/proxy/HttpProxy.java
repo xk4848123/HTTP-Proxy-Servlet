@@ -232,11 +232,6 @@ public class HttpProxy implements Closeable {
         return HttpClientBuilder.create();
     }
 
-    public static boolean isMatch(String uri, String pattern) {
-        String regex = pattern.replace("*", ".*");
-        return uri.matches(regex);
-    }
-
 
     RequestTarget extractUri(String uri) {
         for (String path : targetMap.keySet()) {
