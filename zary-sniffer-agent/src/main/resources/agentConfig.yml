@@ -1,9 +1,14 @@
+#注意/index/*可以匹配/index/、/index、/index/a、/index/a/b等
 #匹配模式到目标URL的映射列表，目前支持带*的路径匹配和全路径匹配
 #匹配优先级是从上到下，匹配到就停止匹配
-#注意/index/*可以匹配/index/a/b/c或/index/，注意不能匹配/index这样的路径
-pattern2TargetUrlList:
-  /pub/version: 192.168.120.144:3004
-  /pub/*: 192.168.120.144:3004
-  /*: http://127.0.0.1:3005
-#去掉匹配的父路径，如:/index/a匹配到/index/*，去掉/index,实际uri成/a
-stripPrefix: false
+#stripPrefix: true会去掉匹配的父路径，如:/index/a匹配到/index/*，去掉/index,实际uri成/a
+routes:
+  - path: /pub/version
+    target: http://192.168.120.144:3004
+    stripPrefix: false
+  - path: /pub/*
+    target: http://192.168.120.144:3004
+    stripPrefix: false
+  - path: /*
+    target: http://127.0.0.1:3005
+    stripPrefix: false

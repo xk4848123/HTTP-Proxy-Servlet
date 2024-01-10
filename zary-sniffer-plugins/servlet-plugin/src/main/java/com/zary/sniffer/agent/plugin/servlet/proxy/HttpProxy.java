@@ -2,6 +2,7 @@ package com.zary.sniffer.agent.plugin.servlet.proxy;
 
 import com.zary.sniffer.agent.core.log.LogProducer;
 import com.zary.sniffer.agent.core.log.LogUtil;
+import com.zary.sniffer.config.Config;
 import com.zary.sniffer.config.ConfigCache;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
@@ -38,7 +39,7 @@ import java.util.regex.Pattern;
 public class HttpProxy implements Closeable {
 
     /**
-     * 日志手机
+     * 日志收集
      */
     LogProducer logProducer = LogUtil.getLogProducer();
     private static HttpProxy instance = new HttpProxy();
@@ -72,7 +73,6 @@ public class HttpProxy implements Closeable {
     protected int connectionRequestTimeout = -1;
     protected int maxConnections = -1;
 
-    protected boolean stripPrefix = false;
     private Map<String, Target> targetMap;
 
     private HttpClient proxyClient;
@@ -142,10 +142,6 @@ public class HttpProxy implements Closeable {
             this.doHandleCompression = Boolean.parseBoolean(doHandleCompression);
         }
 
-        String stripPrefix = ConfigCache.getConfig().getStripPrefix();
-        if (stripPrefix != null) {
-            this.stripPrefix = Boolean.parseBoolean(stripPrefix);
-        }
 
         initTarget();
 
@@ -165,21 +161,21 @@ public class HttpProxy implements Closeable {
     }
 
     protected void initTarget() throws ServletException {
-        List<ConfigCache.Pattern2TargetUrl> pattern2TargetUrlList = ConfigCache.getPattern2TargetUrlList();
+        List<Config.Route> routes = ConfigCache.getConfig().getRoutes();
 
         targetMap = new LinkedHashMap<>();
 
-        for (ConfigCache.Pattern2TargetUrl pattern2TargetUrl : pattern2TargetUrlList) {
-            String pattern = pattern2TargetUrl.getPattern();
+        for (Config.Route route : routes) {
+            String path = route.getPath();
             URI targetUriObj;
             try {
-                targetUriObj = new URI(pattern2TargetUrl.getTargetUrl());
+                targetUriObj = new URI(route.getTarget());
             } catch (Exception e) {
                 throw new ServletException("Trying to process targetUrl init parameter: " + e, e);
             }
             HttpHost targetHost = URIUtils.extractHost(targetUriObj);
 
-            targetMap.put(pattern, new Target(pattern2TargetUrl.getTargetUrl(), targetHost));
+            targetMap.put(path, new Target(route.getTarget(), targetHost, route.getStripPrefix()));
 
         }
     }
@@ -190,6 +186,8 @@ public class HttpProxy implements Closeable {
 
         private HttpHost targetHost;
 
+        private Boolean stripPrefix;
+
 
         public String getTargetUrlBase() {
             return targetUrlBase;
@@ -199,9 +197,14 @@ public class HttpProxy implements Closeable {
             return targetHost;
         }
 
-        public Target(String targetUrlBase, HttpHost targetHost) {
+        public Boolean getStripPrefix() {
+            return stripPrefix;
+        }
+
+        public Target(String targetUrlBase, HttpHost targetHost, Boolean stripPrefix) {
             this.targetUrlBase = targetUrlBase;
             this.targetHost = targetHost;
+            this.stripPrefix = stripPrefix;
         }
     }
 
@@ -236,11 +239,19 @@ public class HttpProxy implements Closeable {
 
 
     RequestTarget extractUri(String uri) {
-        for (String pattern : targetMap.keySet()) {
-            if (!pattern.contains("*") && uri.equals(pattern)) {
-                return new RequestTarget(targetMap.get(pattern).getTargetUrlBase(), targetMap.get(pattern).getTargetUrlBase() + uri, targetMap.get(pattern).getTargetHost());
+        for (String path : targetMap.keySet()) {
+            if (!path.contains("*") && uri.equals(path)) {
+                return new RequestTarget(targetMap.get(path).getTargetUrlBase(), targetMap.get(path).getTargetUrlBase() + uri, targetMap.get(path).getTargetHost());
             }
-            String regex = pattern.replace("*", "(.*)");
+            Boolean stripPrefix = targetMap.get(path).getStripPrefix();
+            if(path.replaceAll("/\\*$", "").equals(uri)){
+                if (stripPrefix){
+                    return new RequestTarget(targetMap.get(path).getTargetUrlBase(), targetMap.get(path).getTargetUrlBase() + "/", targetMap.get(path).getTargetHost());
+                }
+                return new RequestTarget(targetMap.get(path).getTargetUrlBase(), targetMap.get(path).getTargetUrlBase() + uri, targetMap.get(path).getTargetHost());
+            }
+
+            String regex = path.replace("*", "(.*)");
             Pattern p = Pattern.compile(regex);
             Matcher m = p.matcher(uri);
             if (m.matches() && m.groupCount() > 0) {
@@ -252,9 +263,9 @@ public class HttpProxy implements Closeable {
                 }
 
                 if ("".equals(partUri)) {
-                    return new RequestTarget(targetMap.get(pattern).getTargetUrlBase(), targetMap.get(pattern).getTargetUrlBase() + "/", targetMap.get(pattern).getTargetHost());
+                    return new RequestTarget(targetMap.get(path).getTargetUrlBase(), targetMap.get(path).getTargetUrlBase() + "/", targetMap.get(path).getTargetHost());
                 }
-                return new RequestTarget(targetMap.get(pattern).getTargetUrlBase(), targetMap.get(pattern).getTargetUrlBase() + encodeUriQuery(partUri, true), targetMap.get(pattern).getTargetHost());
+                return new RequestTarget(targetMap.get(path).getTargetUrlBase(), targetMap.get(path).getTargetUrlBase() + encodeUriQuery(partUri, true), targetMap.get(path).getTargetHost());
             }
         }
         return null;

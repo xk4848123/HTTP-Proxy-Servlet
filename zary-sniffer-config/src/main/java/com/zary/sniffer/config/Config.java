@@ -1,10 +1,10 @@
 package com.zary.sniffer.config;
 
-import java.util.Map;
+import java.util.List;
 
 public class Config {
 
-    private Map<String, String> pattern2TargetUrlList;
+    private List<Route> routes;
 
     /**
      * 标识客户端IP转发
@@ -61,13 +61,6 @@ public class Config {
      */
     private String stripPrefix;
 
-    public Map<String, String> getPattern2TargetUrlList() {
-        return pattern2TargetUrlList;
-    }
-
-    public void setPattern2TargetUrlList(Map<String, String> pattern2TargetUrlList) {
-        this.pattern2TargetUrlList = pattern2TargetUrlList;
-    }
 
     public String getForwardIp() {
         return forwardIp;
@@ -156,4 +149,45 @@ public class Config {
     public void setStripPrefix(String stripPrefix) {
         this.stripPrefix = stripPrefix;
     }
+
+    public List<Route> getRoutes() {
+        return routes;
+    }
+
+    public void setRoutes(List<Route> routes) {
+        this.routes = routes;
+    }
+
+    public static class Route{
+        private String path;
+
+        private String target;
+
+        private Boolean stripPrefix;
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
+
+        public String getTarget() {
+            return target;
+        }
+
+        public void setTarget(String target) {
+            this.target = target;
+        }
+
+        public Boolean getStripPrefix() {
+            return stripPrefix;
+        }
+
+        public void setStripPrefix(Boolean stripPrefix) {
+            this.stripPrefix = stripPrefix;
+        }
+    }
+
 }

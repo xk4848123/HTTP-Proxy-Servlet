@@ -44,7 +44,7 @@ public class AgentStarter {
     }
 
     public void start(Instrumentation inst) {
-        start0(inst, LogLevel.DEBUG);
+        start0(inst, LogLevel.INFO);
     }
 
     private void start0(Instrumentation inst, LogLevel logLevel) {
