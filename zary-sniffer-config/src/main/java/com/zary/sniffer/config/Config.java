@@ -4,6 +4,9 @@ import java.util.List;
 
 public class Config {
 
+    /**
+     * 路由列表
+     */
     private List<Route> routes;
 
     /**
