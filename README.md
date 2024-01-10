@@ -1,180 +1,33 @@
 # 简介
 
-这是一个探针模板工程，可快速进行探针应用开发
+基于插桩在Servlet内部对配置路径进行反向代理，实现将请求转发到其他服务器，目前支持基于Spring MVC和Spring Boot的应用。
 
+# 快速开始
 
-# 如何开始
-
-plugins模块中自定义plugin即可，例如demo-plugin中：
-```java
-public class MethodPlugin extends AbstractPlugin {
-    private static final String HANDLER = "handler.com.zary.sniffer.plugin.MethodHandler";
-
-    private static final String TYPE = "com.telit.microgenerator.LogoPrinter";
-
-    @Override
-    public ElementMatcher<TypeDescription> getPluginTypeMatcher() {
-        return ElementMatchers.named(TYPE);
-    }
-
-    @Override
-    public IConstructorPoint[] getConstructorPoints() {
-        return new IConstructorPoint[0];
-    }
-
-    @Override
-    public IInstanceMethodPoint[] getInstanceMethodPoints() {
-        IInstanceMethodPoint point = new IInstanceMethodPoint() {
-            @Override
-            public ElementMatcher<MethodDescription> getMethodsMatcher() {
-                return ElementMatchers.named("print2");
-            }
-
-            @Override
-            public String getHandlerClassName() {
-                return HANDLER;
-            }
-
-            //是否有参数调用
-            @Override
-            public boolean isMorphArgs() {
-                return true;
-            }
-        };
-        return new IInstanceMethodPoint[]{point};
-    }
-
-    @Override
-    public IStaticMethodPoint[] getStaticMethodPoints() {
-        return new IStaticMethodPoint[0];
-    }
-}
-
-public class MethodHandler implements IInstanceMethodHandler {
-
-    @Override
-    public void onBefore(Object o, Method method, Object[] objects, HandlerBeforeResult handlerBeforeResult) throws Throwable {
-        Tracer curTracer = TracerUtil.getCurTracer();
-        Span span = curTracer.buildSpan("method").start();
-        curTracer.activateSpan(span);
-
-
-    }
-
-    @Override
-    public Object onAfter(Object instance, Method method, Object[] allArguments, Object returnValue) throws Throwable {
-        Tracer curTracer = TracerUtil.getCurTracer();
-        Span span = curTracer.activeSpan();
-        span.finish();
-        List<Span> spans = ((Tracer) curTracer).finishedSpans();
-        LogUtil.info("spans", spans.toString());
-
-        return returnValue;
-    }
-}
+## 配置简介
+```shell
+#匹配模式到目标URL的映射列表，目前支持带*的路径匹配和全路径匹配
+#匹配优先级是从上到下，匹配到就停止匹配
+#注意/index/*可以匹配/index/、/index、/index/a、/index/a/b等
+#stripPrefix: true会去掉匹配的父路径，如:/index/a匹配到/index/*，去掉/index,实际uri成/a
+routes:
+- path: /pub/version
+  target: http://192.168.120.144:3004
+  stripPrefix: false
+- path: /pub/*
+  target: http://192.168.120.144:3004
+  stripPrefix: false
+- path: /*
+  target: http://127.0.0.1:3005
+  stripPrefix: false
 ```
 
-# span使用介绍
 
-## 基本使用
 
-```java
-    Tracer tracer = TracerUtil.getCurTracer();
-
-    Span span = tracer.buildSpan("tester").withStartTimestamp(1000).start();
-    span.setTag("string", "foo");
-    span.setTag("int", 7);
-    span.log("foo");
-    Map<String, Object> fields = new HashMap<>();
-    fields.put("f1", 4);
-    fields.put("f2", "two");
-    span.log(1002, fields);
-    span.log(1003, "event name");
-    span.finish(2000);
-
-    List<MockSpan> finishedSpans = tracer.finishedSpans();
-
-        TracerUtil.removeCurTracer();
-    
+## 部署使用
+```shell
+mvn clean package -DskipTests
 ```
-
-## 跨方法传递span
-```java
-    //方法一
-    Tracer tracer = TracerUtil.getCurTracer();
-    Span span = tracer.buildSpan("foo").start();
-    tracer.activateSpan(span);
-
-    //方法二
-    Tracer tracer = TracerUtil.getCurTracer();
-    Span span = tracer.activeSpan();
-```
-
-## 跨进程传递span
-```java
-    //进程一
-    Tracer tracer = TracerUtil.getCurTracer();
-    Span parentSpan = tracer.buildSpan("foo").start();
-    parentSpan.finish();
-
-    HashMap<String, String> injectMap = new HashMap<>();
-    tracer.inject(parentSpan.context(), Format.Builtin.HTTP_HEADERS,
-                    new TextMapAdapter(injectMap));
-    
-    //进程二
-    Tracer tracer = TracerUtil.getCurTracer();
-    SpanContext extract = tracer.extract(Format.Builtin.HTTP_HEADERS, new TextMapAdapter(injectMap));
-    tracer.buildSpan("bar")
-                    .asChildOf(extract)
-                    .start();
-```
-# 如何上报数据
-
-## 插件端上报
-```java
-    Message2 message2 = new Message2(1L,"msg");
-    AgentData<Message2> agentData = new AgentData<>();
-    //与server端接收type匹配
-    agentData.setType(1);
-    agentData.setData(message2);
-    AgentDataUtil.sendData(agentData);
-```
-## server端接收
-
-在server端main方法中启动并订阅数据，定义接收回调处理
-```java
-public static void main(String[] args) {
-    AgentServerStarter defaultServerStarter = new AgentServerStarter();
-
-    HandleManager handleManager = new HandleManager();
-    AgentDataHandler agentDataHandler = new AgentDataHandler();
-    
-    //如果上报数据类型复杂可使用ParameterizedType自定义，这里的1对应插件端agentData.setType(1)
-    handleManager.addHandler(1, Message2.class, agentDataHandler::handleMessage2);
-
-    defaultServerStarter.start(handleManager);
-    
-
-    }
-
-/**
- * 回调处理类
- */
-public class AgentDataHandler {
-
-    public Boolean handleMessage2(List<AgentData<Message2>> datas) {
-        for (AgentData agentData : datas) {
-            Message2 message2 = (Message2) agentData.getData();
-            log.info(message2.toString());
-        }
-        return true;
-    }
-
-}
-```
-
-## 打包部署
-
-mvn package后工程目录下会有zary-sniffer-x-packages目录，将plugins和zary-sniffer-xxx-agent.xxx.jar复制到需要执行的jar所在目录下
+zary-sniffer-x-packages目录，将plugins和zary-sniffer-xxx-agent.xxx.jar复制到需要执行的jar所在目录下
 
 执行java -javaagent:zary-sniffer-xxx-agent.xxx.jar -jar xxx.jar即可
