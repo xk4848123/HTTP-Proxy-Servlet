@@ -161,8 +161,10 @@ public class Config {
         this.routes = routes;
     }
 
-    public static class Route{
+    public static class Route {
         private String path;
+
+        private String type;
 
         private String target;
 
@@ -174,6 +176,15 @@ public class Config {
 
         public void setPath(String path) {
             this.path = path;
+        }
+
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
         }
 
         public String getTarget() {
@@ -190,6 +201,35 @@ public class Config {
 
         public void setStripPrefix(Boolean stripPrefix) {
             this.stripPrefix = stripPrefix;
+        }
+    }
+
+    public enum RouteType {
+        PROXY("proxy"),
+        FILE("file"),
+
+        REDIRECT_301("301"),
+
+        REDIRECT_302("302"),
+
+        NOT_FOUND_404("404"),
+        UNAUTHORIZED_403("403"),
+        SERVER_ERROR_500("500"),
+        ;
+        private final String type;
+
+        RouteType(String type) {
+            this.type = type;
+        }
+
+        //提供一个将字符串转换为RouteType的静态方法
+        public static RouteType fromString(String type) {
+            for (RouteType value : RouteType.values()) {
+                if (value.type.equalsIgnoreCase(type)) {
+                    return value;
+                }
+            }
+            throw new IllegalArgumentException("Invalid route type: " + type);
         }
     }
 

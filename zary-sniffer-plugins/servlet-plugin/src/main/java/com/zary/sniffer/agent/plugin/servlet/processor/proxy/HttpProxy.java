@@ -1,4 +1,4 @@
-package com.zary.sniffer.agent.plugin.servlet.proxy;
+package com.zary.sniffer.agent.plugin.servlet.processor.proxy;
 
 import com.zary.sniffer.agent.core.log.LogProducer;
 import com.zary.sniffer.agent.core.log.LogUtil;
@@ -42,7 +42,7 @@ public class HttpProxy implements Closeable {
      * 日志收集
      */
     LogProducer logProducer = LogUtil.getLogProducer();
-    private static HttpProxy instance = new HttpProxy();
+    private static final HttpProxy instance = new HttpProxy();
 
     public static HttpProxy getInstance() {
         return instance;
@@ -142,9 +142,6 @@ public class HttpProxy implements Closeable {
             this.doHandleCompression = Boolean.parseBoolean(doHandleCompression);
         }
 
-
-        initTarget();
-
         proxyClient = createHttpClient();
     }
 
@@ -160,33 +157,13 @@ public class HttpProxy implements Closeable {
         return SocketConfig.custom().setSoTimeout(readTimeout).build();
     }
 
-    protected void initTarget() throws ServletException {
-        List<Config.Route> routes = ConfigCache.getConfig().getRoutes();
-
-        targetMap = new LinkedHashMap<>();
-
-        for (Config.Route route : routes) {
-            String path = route.getPath();
-            URI targetUriObj;
-            try {
-                targetUriObj = new URI(route.getTarget());
-            } catch (Exception e) {
-                throw new ServletException("Trying to process targetUrl init parameter: " + e, e);
-            }
-            HttpHost targetHost = URIUtils.extractHost(targetUriObj);
-
-            targetMap.put(path, new Target(route.getTarget(), targetHost, route.getStripPrefix()));
-
-        }
-    }
-
     private static class Target {
 
-        private String targetUrlBase;
+        private final String targetUrlBase;
 
-        private HttpHost targetHost;
+        private final HttpHost targetHost;
 
-        private Boolean stripPrefix;
+        private final Boolean stripPrefix;
 
 
         public String getTargetUrlBase() {
@@ -218,7 +195,9 @@ public class HttpProxy implements Closeable {
             clientBuilder.disableContentCompression();
         }
 
-        if (useSystemProperties) clientBuilder = clientBuilder.useSystemProperties();
+        if (useSystemProperties) {
+            clientBuilder.useSystemProperties();
+        }
         return buildHttpClient(clientBuilder);
     }
 
@@ -233,43 +212,50 @@ public class HttpProxy implements Closeable {
     }
 
 
-    RequestTarget extractUri(String uri) {
-        for (String path : targetMap.keySet()) {
-            if (!path.contains("*") && uri.equals(path)) {
-                return new RequestTarget(targetMap.get(path).getTargetUrlBase(), targetMap.get(path).getTargetUrlBase() + uri, targetMap.get(path).getTargetHost());
+    RequestTarget extractUri(String uri, Config.Route route) throws ServletException {
+        String path = route.getPath();
+        URI targetUriObj;
+        try {
+            targetUriObj = new URI(route.getTarget());
+        } catch (Exception e) {
+            throw new ServletException("Trying to process targetUrl init parameter: " + e, e);
+        }
+        HttpHost targetHost = URIUtils.extractHost(targetUriObj);
+        if (!path.contains("*") && uri.equals(path)) {
+            return new RequestTarget(route.getTarget(), route.getTarget() + uri, targetHost);
+        }
+
+        Boolean stripPrefix = route.getStripPrefix();
+        if (path.replaceAll("/\\*$", "").equals(uri)) {
+            if (stripPrefix) {
+                return new RequestTarget(route.getTarget(), route.getTarget() + "/", targetHost);
             }
-            Boolean stripPrefix = targetMap.get(path).getStripPrefix();
-            if(path.replaceAll("/\\*$", "").equals(uri)){
-                if (stripPrefix){
-                    return new RequestTarget(targetMap.get(path).getTargetUrlBase(), targetMap.get(path).getTargetUrlBase() + "/", targetMap.get(path).getTargetHost());
-                }
-                return new RequestTarget(targetMap.get(path).getTargetUrlBase(), targetMap.get(path).getTargetUrlBase() + uri, targetMap.get(path).getTargetHost());
+            return new RequestTarget(route.getTarget(), route.getTarget() + uri, targetHost);
+        }
+
+        String regex = path.replace("*", "(.*)");
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(uri);
+        if (m.matches() && m.groupCount() > 0) {
+            String partUri;
+            if (stripPrefix) {
+                partUri = "/" + m.group(1);
+            } else {
+                partUri = uri;
             }
 
-            String regex = path.replace("*", "(.*)");
-            Pattern p = Pattern.compile(regex);
-            Matcher m = p.matcher(uri);
-            if (m.matches() && m.groupCount() > 0) {
-                String partUri;
-                if (stripPrefix) {
-                    partUri = "/" + m.group(1);
-                } else {
-                    partUri = uri;
-                }
-
-                if ("".equals(partUri)) {
-                    return new RequestTarget(targetMap.get(path).getTargetUrlBase(), targetMap.get(path).getTargetUrlBase() + "/", targetMap.get(path).getTargetHost());
-                }
-                return new RequestTarget(targetMap.get(path).getTargetUrlBase(), targetMap.get(path).getTargetUrlBase() + encodeUriQuery(partUri, true), targetMap.get(path).getTargetHost());
+            if ("".equals(partUri)) {
+                return new RequestTarget(route.getTarget(), route.getTarget() + "/", targetHost);
             }
+            return new RequestTarget(route.getTarget(), route.getTarget() + encodeUriQuery(partUri, true), targetHost);
         }
         return null;
     }
 
     private static class RequestTarget {
-        private String targetUrl;
-        private HttpHost targetHost;
-        private String targetUrlBase;
+        private final String targetUrl;
+        private final HttpHost targetHost;
+        private final String targetUrlBase;
 
         public RequestTarget(String targetUrlBase, String targetUrl, HttpHost targetHost) {
             this.targetUrlBase = targetUrlBase;
@@ -290,20 +276,16 @@ public class HttpProxy implements Closeable {
         }
     }
 
-    public boolean service(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+    public void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse, Config.Route route) {
         RequestTarget requestTarget;
         try {
             String uri = servletRequest.getRequestURI();
-            requestTarget = extractUri(uri);
+            requestTarget = extractUri(uri, route);
         } catch (Exception e) {
             logProducer.error("Parse url fail!", e.getMessage());
-            return false;
+            return;
         }
 
-
-        if (requestTarget == null) {
-            return false;
-        }
 
         if (servletRequest.getAttribute(ATTR_TARGET_URI) == null) {
             servletRequest.setAttribute(ATTR_TARGET_URI, requestTarget.getTargetUrl());
@@ -327,7 +309,7 @@ public class HttpProxy implements Closeable {
                 proxyRequest = newProxyRequestWithEntity(method, proxyRequestUri, servletRequest);
             } catch (IOException e) {
                 logProducer.error("Error while creating the proxy request with entity", e.getMessage());
-                return true;
+                return;
             }
 
         } else {
@@ -363,14 +345,12 @@ public class HttpProxy implements Closeable {
                 handleRequestException(proxyRequest, proxyResponse, e);
             } catch (Exception e2) {
                 logProducer.error("Handel Request Exception!", e2.getMessage());
-                return true;
             }
 
         } finally {
             // 确保整个实体都被消费掉了，这样连接就被释放了
             if (proxyResponse != null) EntityUtils.consumeQuietly(proxyResponse.getEntity());
         }
-        return true;
     }
 
     /**
