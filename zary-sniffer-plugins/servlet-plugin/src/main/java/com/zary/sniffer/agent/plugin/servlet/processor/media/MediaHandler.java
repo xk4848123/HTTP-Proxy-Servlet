@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.rmi.RemoteException;
 
 public class MediaHandler {
     private static final MediaHandler instance = new MediaHandler();
@@ -25,7 +24,7 @@ public class MediaHandler {
         String basePath = SystemUtil.getExecutePath();
         File file = new File(basePath + File.separator + route.getTarget());
         if (!file.exists()) {
-            throw new RemoteException("file not found");
+            throw new RuntimeException("file not found");
         }
         String fileContent = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 

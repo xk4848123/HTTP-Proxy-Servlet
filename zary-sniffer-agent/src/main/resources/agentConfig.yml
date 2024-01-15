@@ -6,9 +6,18 @@
 
 #当type为file时，target为resources下的相对路径
 
-#目前type类型包括：301(永久重定向)、302(重定向)、file(媒体文件包括html、json、xml、txt等等)
-#待做script脚本插入、cookie
+#目前type类型包括：301(永久重定向)、302(重定向)、file(媒体文件包括html、json、xml、txt等等)、script脚本插入及添加cookie
 routes:
+  - path: /resources/templates/dianwang03/index.html
+    type: script
+    target: script/test.script
+    cookies:
+      - name: test
+        value: 123
+        cookiePath: /
+      - name: test2
+        value: 1234
+        cookiePath: /
   - path: /404
     type: 404
   - path: /403

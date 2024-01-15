@@ -22,6 +22,7 @@ import org.yaml.snakeyaml.Yaml;
 import javax.naming.ConfigurationException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.util.List;
@@ -109,4 +110,14 @@ public class AgentStarter {
                 .or(nameStartsWith("sun.reflect")).or(ElementMatchers.isSynthetic()));
     }
 
+    public static void main(String[] args) throws FileNotFoundException {
+        Yaml yaml = new Yaml();
+        FileInputStream fileInputStream = new FileInputStream("D:\\code4\\HTTP-Proxy-Servlet\\zary-sniffer-agent\\src\\main\\resources\\agentConfig.yml");
+        Config config = yaml.loadAs(fileInputStream, Config.class);
+        ConfigCache.setConfig(config);
+
+        RouteSelector routeSelector = new RouteSelector();
+        Config.Route choose = routeSelector.choose("/resources/templates/dianwang03/index.html");
+        System.out.println(choose);
+    }
 }

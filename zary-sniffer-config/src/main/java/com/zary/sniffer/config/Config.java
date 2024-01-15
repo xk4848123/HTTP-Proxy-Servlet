@@ -161,6 +161,39 @@ public class Config {
         this.routes = routes;
     }
 
+    public static class Cookie {
+
+        private String name;
+
+        private String value;
+
+        private String cookiePath;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String getCookiePath() {
+            return cookiePath;
+        }
+
+        public void setCookiePath(String cookiePath) {
+            this.cookiePath = cookiePath;
+        }
+    }
+
     public static class Route {
         private String path;
 
@@ -169,6 +202,8 @@ public class Config {
         private String target;
 
         private Boolean stripPrefix;
+
+        private List<Cookie> cookies;
 
         public String getPath() {
             return path;
@@ -202,10 +237,19 @@ public class Config {
         public void setStripPrefix(Boolean stripPrefix) {
             this.stripPrefix = stripPrefix;
         }
+
+        public List<Cookie> getCookies() {
+            return cookies;
+        }
+
+        public void setCookies(List<Cookie> cookies) {
+            this.cookies = cookies;
+        }
     }
 
     public enum RouteType {
         PROXY("proxy"),
+
         FILE("file"),
 
         REDIRECT_301("301"),
@@ -213,8 +257,11 @@ public class Config {
         REDIRECT_302("302"),
 
         NOT_FOUND_404("404"),
+
         UNAUTHORIZED_403("403"),
         SERVER_ERROR_500("500"),
+
+        INJECT_SCRIPT("script"),
         ;
         private final String type;
 
