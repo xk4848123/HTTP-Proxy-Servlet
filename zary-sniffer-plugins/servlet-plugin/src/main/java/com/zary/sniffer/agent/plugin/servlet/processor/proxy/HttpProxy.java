@@ -2,6 +2,8 @@ package com.zary.sniffer.agent.plugin.servlet.processor.proxy;
 
 import com.zary.sniffer.agent.core.log.LogProducer;
 import com.zary.sniffer.agent.core.log.LogUtil;
+import com.zary.sniffer.agent.plugin.servlet.route.RouteSelector;
+import com.zary.sniffer.agent.plugin.servlet.util.UriEncoder;
 import com.zary.sniffer.config.Config;
 import com.zary.sniffer.config.ConfigCache;
 import org.apache.http.*;
@@ -30,18 +32,13 @@ import java.io.OutputStream;
 import java.net.HttpCookie;
 import java.net.URI;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Http反向代理类
  */
 public class HttpProxy implements Closeable {
 
-    /**
-     * 日志收集
-     */
-    LogProducer logProducer = LogUtil.getLogProducer();
+
     private static final HttpProxy instance = new HttpProxy();
 
     public static HttpProxy getInstance() {
@@ -73,9 +70,14 @@ public class HttpProxy implements Closeable {
     protected int connectionRequestTimeout = -1;
     protected int maxConnections = -1;
 
-    private Map<String, Target> targetMap;
-
     private HttpClient proxyClient;
+
+    /**
+     * 日志收集
+     */
+    private LogProducer logProducer;
+
+    private RouteSelector routeSelector;
 
 
     protected String getTargetUri(HttpServletRequest servletRequest) {
@@ -143,6 +145,10 @@ public class HttpProxy implements Closeable {
         }
 
         proxyClient = createHttpClient();
+
+        logProducer = LogUtil.getLogProducer();
+
+        routeSelector = new RouteSelector();
     }
 
 
@@ -156,35 +162,6 @@ public class HttpProxy implements Closeable {
         }
         return SocketConfig.custom().setSoTimeout(readTimeout).build();
     }
-
-    private static class Target {
-
-        private final String targetUrlBase;
-
-        private final HttpHost targetHost;
-
-        private final Boolean stripPrefix;
-
-
-        public String getTargetUrlBase() {
-            return targetUrlBase;
-        }
-
-        public HttpHost getTargetHost() {
-            return targetHost;
-        }
-
-        public Boolean getStripPrefix() {
-            return stripPrefix;
-        }
-
-        public Target(String targetUrlBase, HttpHost targetHost, Boolean stripPrefix) {
-            this.targetUrlBase = targetUrlBase;
-            this.targetHost = targetHost;
-            this.stripPrefix = stripPrefix;
-        }
-    }
-
 
     protected HttpClient createHttpClient() {
         HttpClientBuilder clientBuilder = getHttpClientBuilder().setDefaultRequestConfig(buildRequestConfig()).setDefaultSocketConfig(buildSocketConfig());
@@ -211,46 +188,6 @@ public class HttpProxy implements Closeable {
         return HttpClientBuilder.create();
     }
 
-
-    RequestTarget extractUri(String uri, Config.Route route) throws ServletException {
-        String path = route.getPath();
-        URI targetUriObj;
-        try {
-            targetUriObj = new URI(route.getTarget());
-        } catch (Exception e) {
-            throw new ServletException("Trying to process targetUrl init parameter: " + e, e);
-        }
-        HttpHost targetHost = URIUtils.extractHost(targetUriObj);
-        if (!path.contains("*") && uri.equals(path)) {
-            return new RequestTarget(route.getTarget(), route.getTarget() + uri, targetHost);
-        }
-
-        Boolean stripPrefix = route.getStripPrefix();
-        if (path.replaceAll("/\\*$", "").equals(uri)) {
-            if (stripPrefix) {
-                return new RequestTarget(route.getTarget(), route.getTarget() + "/", targetHost);
-            }
-            return new RequestTarget(route.getTarget(), route.getTarget() + uri, targetHost);
-        }
-
-        String regex = path.replace("*", "(.*)");
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(uri);
-        if (m.matches() && m.groupCount() > 0) {
-            String partUri;
-            if (stripPrefix) {
-                partUri = "/" + m.group(1);
-            } else {
-                partUri = uri;
-            }
-
-            if ("".equals(partUri)) {
-                return new RequestTarget(route.getTarget(), route.getTarget() + "/", targetHost);
-            }
-            return new RequestTarget(route.getTarget(), route.getTarget() + encodeUriQuery(partUri, true), targetHost);
-        }
-        return null;
-    }
 
     private static class RequestTarget {
         private final String targetUrl;
@@ -279,8 +216,9 @@ public class HttpProxy implements Closeable {
     public void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse, Config.Route route) {
         RequestTarget requestTarget;
         try {
-            String uri = servletRequest.getRequestURI();
-            requestTarget = extractUri(uri, route);
+            String newUri = routeSelector.generateJointUri(servletRequest.getRequestURI(), route);
+            HttpHost targetHost = URIUtils.extractHost(new URI(route.getTarget()));
+            requestTarget = new RequestTarget(route.getTarget(), route.getTarget() + newUri, targetHost);
         } catch (Exception e) {
             logProducer.error("Parse url fail!", e.getMessage());
             return;
@@ -585,13 +523,13 @@ public class HttpProxy implements Closeable {
         if (queryString != null && queryString.length() > 0) {
             uri.append('?');
             // queryString未解码，因此我们需要encodeUriQuery不要对“%”个字符进行编码，以避免双重编码
-            uri.append(encodeUriQuery(queryString, false));
+            uri.append(UriEncoder.encodeUriQuery(queryString, false));
         }
 
         if (doSendUrlFragment && fragment != null) {
             uri.append('#');
             // 片段未解码，因此我们需要encodeUriQuery不要对“%”个字符进行编码，以避免双重编码
-            uri.append(encodeUriQuery(fragment, false));
+            uri.append(UriEncoder.encodeUriQuery(fragment, false));
         }
         return uri.toString();
     }
@@ -620,36 +558,6 @@ public class HttpProxy implements Closeable {
         return theUrl;
     }
 
-    /**
-     * 对URI的查询或片段部分中的字符进行编码。
-     */
-    protected CharSequence encodeUriQuery(CharSequence in, boolean encodePercent) {
-        StringBuilder outBuf = null;
-        Formatter formatter = null;
-        for (int i = 0; i < in.length(); i++) {
-            char c = in.charAt(i);
-            boolean escape = true;
-            if (c < 128) {
-                if (asciiQueryChars.get(c) && !(encodePercent && c == '%')) {
-                    escape = false;
-                }
-            } else if (!Character.isISOControl(c) && !Character.isSpaceChar(c)) {//not-ascii
-                escape = false;
-            }
-            if (!escape) {
-                if (outBuf != null) outBuf.append(c);
-            } else {
-                //escape
-                if (outBuf == null) {
-                    outBuf = new StringBuilder(in.length() + 5 * 3);
-                    outBuf.append(in, 0, i);
-                    formatter = new Formatter(outBuf);
-                }
-                formatter.format("%%%02X", (int) c);//TODO
-            }
-        }
-        return outBuf != null ? outBuf : in;
-    }
 
     protected static final BitSet asciiQueryChars;
 

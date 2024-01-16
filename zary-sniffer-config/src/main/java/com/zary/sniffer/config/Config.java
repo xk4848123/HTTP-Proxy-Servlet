@@ -206,6 +206,9 @@ public class Config {
         private List<Cookie> cookies;
 
         public String getPath() {
+            if (!path.startsWith("/")) {
+                path = "/" + path;
+            }
             return path;
         }
 
