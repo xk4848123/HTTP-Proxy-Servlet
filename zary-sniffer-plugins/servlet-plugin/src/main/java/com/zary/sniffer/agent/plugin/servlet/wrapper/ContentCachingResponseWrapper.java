@@ -123,6 +123,10 @@ public class ContentCachingResponseWrapper extends HttpServletResponseWrapper {
     }
 
     @Override
+    public void flushBuffer() throws IOException {
+    }
+
+    @Override
     public void resetBuffer() {
         this.content.reset();
     }
