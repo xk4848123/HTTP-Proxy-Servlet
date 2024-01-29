@@ -109,4 +109,11 @@ public class AgentStarter {
                 .or(nameStartsWith("sun.reflect")).or(ElementMatchers.isSynthetic()));
     }
 
+    public static void main(String[] args) throws IOException, InterruptedException {
+        ConfigLoader.loadConfigMonitorChanges("D:\\test\\agentConfig.yml");
+        while (true){
+            Thread.sleep(1000);
+            System.out.println(ConfigCache.getConfig().getRoutes());
+        }
+    }
 }

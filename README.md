@@ -62,8 +62,6 @@ routes:
     stripPrefix: false
 ```
 
-
-
 ## 部署使用
 ```shell
 mvn clean package -DskipTests
@@ -71,3 +69,109 @@ mvn clean package -DskipTests
 将zary-honeynet-sniffer-x-packages/sniffer-agent目录下所有文件拷贝到需要执行jar的目录下
 
 执行java -javaagent:zary-honeynet-sniffer-xxx-agent.xxx.jar -jar xxx.jar即可
+
+## 案例展示
+启一个空壳（无任何Controller）SpringBoot程序，使用Zary Honeynet Sniffer X插件，拦截请求。
+
+### 1.配置反向代理proxy相关示例
+
+agentConfig.yml配置如下：
+```shell
+# 将api-upms下的请求交由192.168.120.144:3002处理
+routes:
+  - path: /api-upms/*
+    type: proxy
+    target: http://192.168.120.144:3002
+    stripPrefix: false
+```
+比较下面两张图可以知晓请求头也被传予目标服务
+![img.png](img/img.png)
+![img.png](img/img2.png)
+
+```shell
+# 将/pub下的请求交由192.168.120.144:3004处理
+routes:
+  - path: /pub/*
+    type: proxy
+    target: http://192.168.120.144:3004
+    stripPrefix: false
+```
+由于/sys/sys-api/judgeGrant没有被代理，并且原SpringBoot也未提供该接口，所以404
+![img.png](img/img3.png)
+![img_1.png](img/img4.png)
+
+越靠前的route处理优先级越高
+```shell
+# 将/pub下的请求交由192.168.120.144:3004处理，其他请求交由192.168.120.144:3002处理
+routes:
+  - path: /pub/*
+    type: proxy
+    target: http://192.168.120.144:3004
+    stripPrefix: false
+  - path: /*
+    type: proxy
+    target: http://192.168.120.144:3002
+    stripPrefix: false    
+```
+![img.png](img/img4.png)
+![img.png](img/img5.png)
+
+### 2.配置直接返回媒体文件(媒体文件包括html、json、xml、txt、mp3、mp4等等)
+```shell
+routes:
+  - path: /txt
+    type: file
+    target: txt/1.txt
+  - path: /json
+    type: file
+    target: json/all.json
+  - path: /login
+    type: file
+    target: html/login.html
+```
+target为媒体文件相对路径
+
+![img.png](img/img6.png)
+![img_1.png](img/img7.png)
+![img_2.png](img/img8.png)
+
+### 3.配置重定向到其他地址
+站内地址，直接写 /uri（uri为你的站内有的地址） 即可
+```shell
+routes:
+  - path: /301
+    type: 301
+    target: https://www.baidu.com/
+  - path: /302
+    type: 302
+    target: https://blog.csdn.net/qq_24365213/article/details/78225085
+```
+![img.png](img/img9.png)
+![img_1.png](img/img10.png)
+
+### 4.配置插入脚本或增加cookie
+
+
+```shell
+routes:
+  - path: /admin/u/toLogin
+    type: script
+    target: script/test.script
+    cookies:
+      - name: test
+        value: 123
+        cookiePath: /
+      - name: test2
+        value: 1234
+        cookiePath: /
+```
+
+target为要插入的脚本
+
+![img.png](img/img11.png)
+
+效果如下：
+
+![img_1.png](img/img12.png)
+
+![img_2.png](img/img13.png)
