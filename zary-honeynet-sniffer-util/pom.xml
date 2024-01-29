@@ -2,12 +2,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>zary-sniffer</artifactId>
+        <artifactId>zary-honeynet-sniffer</artifactId>
         <groupId>com.zary</groupId>
         <version>1.0.1</version>
     </parent>
 
-    <artifactId>zary-sniffer-util</artifactId>
+    <artifactId>zary-honeynet-sniffer-util</artifactId>
     <version>1.0.1</version>
     <dependencies>
         <dependency>

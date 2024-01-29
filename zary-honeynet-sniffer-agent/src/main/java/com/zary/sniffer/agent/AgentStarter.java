@@ -11,6 +11,7 @@ import com.zary.sniffer.agent.core.plugin.loader.AgentClassLoader;
 import com.zary.sniffer.agent.core.plugin.loader.PluginLoader;
 import com.zary.sniffer.config.Config;
 import com.zary.sniffer.config.ConfigCache;
+import com.zary.sniffer.config.ConfigLoader;
 import com.zary.sniffer.util.FileUtil;
 import com.zary.sniffer.util.SystemUtil;
 import net.bytebuddy.ByteBuddy;
@@ -69,10 +70,8 @@ public class AgentStarter {
         if (!isConfigExist) {
             throw new ConfigurationException("Could not find" + CoreConsts.AGENT_CONFIG + "in agent path");
         }
-        Yaml yaml = new Yaml();
-        FileInputStream fileInputStream = new FileInputStream(configFile);
-        Config config = yaml.loadAs(fileInputStream, Config.class);
-        ConfigCache.setConfig(config);
+
+        ConfigLoader.loadConfigMonitorChanges(configFile);
     }
 
 
@@ -110,14 +109,4 @@ public class AgentStarter {
                 .or(nameStartsWith("sun.reflect")).or(ElementMatchers.isSynthetic()));
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
-        Yaml yaml = new Yaml();
-        FileInputStream fileInputStream = new FileInputStream("D:\\code4\\HTTP-Proxy-Servlet\\zary-sniffer-agent\\src\\main\\resources\\agentConfig.yml");
-        Config config = yaml.loadAs(fileInputStream, Config.class);
-        ConfigCache.setConfig(config);
-
-        RouteSelector routeSelector = new RouteSelector();
-        Config.Route choose = routeSelector.choose("/resources/templates/dianwang03/index.html");
-        System.out.println(choose);
-    }
 }

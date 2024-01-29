@@ -5,15 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.zary</groupId>
-    <artifactId>zary-sniffer</artifactId>
+    <artifactId>zary-honeynet-sniffer</artifactId>
     <packaging>pom</packaging>
     <version>1.0.1</version>
     <modules>
-        <module>zary-sniffer-agent</module>
-        <module>zary-sniffer-agent-core</module>
-        <module>zary-sniffer-plugins</module>
-        <module>zary-sniffer-util</module>
-        <module>zary-sniffer-config</module>
+        <module>zary-honeynet-sniffer-agent</module>
+        <module>zary-honeynet-sniffer-agent-core</module>
+        <module>zary-honeynet-sniffer-plugins</module>
+        <module>zary-honeynet-sniffer-util</module>
+        <module>zary-honeynet-sniffer-config</module>
     </modules>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

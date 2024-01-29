@@ -2,51 +2,47 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>zary-sniffer</artifactId>
         <groupId>com.zary</groupId>
+        <artifactId>zary-honeynet-sniffer</artifactId>
         <version>1.0.1</version>
     </parent>
 
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>zary-sniffer-agent</artifactId>
-    <version>1.0.1</version>
-    <!-- 全局变量 -->
+    <artifactId>zary-honeynet-sniffer-plugins</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>servlet-plugin</module>
+    </modules>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- agent最终输出目录 -->
-        <agent.package.dir>${project.build.directory}/../../zary-sniffer-x-packages/sniffer-agent</agent.package.dir>
+        <agent.package.dir>${project.build.directory}/../../../zary-honeynet-sniffer-x-packages/sniffer-agent</agent.package.dir>
+        <!-- agent最终输出目录下的plugins目录 -->
+        <plugin.dir>${agent.package.dir}/plugins</plugin.dir>
         <!-- 第三方包重定向命名空间前缀 -->
         <shade.package>com.zary.sniffer.agent.depencies</shade.package>
     </properties>
-    <!-- dependencies -->
+    <!-- 插件全局依赖，但插件本身被agent动态加载，所以provided -->
     <dependencies>
-        <!--zary-sniffer-agent-core-->
         <dependency>
             <groupId>com.zary</groupId>
-            <artifactId>zary-sniffer-agent-core</artifactId>
+            <artifactId>zary-honeynet-sniffer-agent-core</artifactId>
             <version>1.0.1</version>
+            <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>com.zary</groupId>
-            <artifactId>zary-sniffer-transfer</artifactId>
+            <artifactId>zary-honeynet-sniffer-config</artifactId>
             <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.zary</groupId>
-            <artifactId>zary-sniffer-config</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>2.0</version>
         </dependency>
     </dependencies>
-    <!-- build -->
+    <!-- 插件包打包配置，实现下属插件统一打包并移动到zary-honeynet-sniffer-agent输出目录指定位置 -->
     <build>
         <plugins>
+            <!-- 指定编译环境 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -68,46 +64,18 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
-                        <!--打包配置-->
                         <configuration>
-                            <!--<finalName>zary-sniffer-agent-1.0</finalName>-->
                             <!--是否带shaded后缀，默认true-->
                             <shadedArtifactAttached>false</shadedArtifactAttached>
                             <!--是否生成依赖排除文件，默认true-->
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
                             <createSourcesJar>false</createSourcesJar>
                             <shadeSourcesContent>false</shadeSourcesContent>
-                            <!--配置MainClass-->
-                            <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <manifestEntries>
-                                        <Agent-Class>com.zary.sniffer.agent.AgentStarter</Agent-Class>
-                                        <Premain-Class>com.zary.sniffer.agent.AgentStarter</Premain-Class>
-                                        <Can-Redefine-Classes>true</Can-Redefine-Classes>
-                                        <Can-Retransform-Classes>true</Can-Retransform-Classes>
-                                        <!--<Class-Path>plugins/springmvc-plugin-0.1.jar</Class-Path>-->
-                                    </manifestEntries>
-                                </transformer>
-                            </transformers>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>**/module-info.class</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                            <!--探针使用组件重定向，防止与宿主命名空间冲突-->
-                            <!-- protostuff  yml                     -->
+                            <!--bytebuddy重定向，防止命名空间冲突-->
                             <relocations>
                                 <relocation>
                                     <pattern>net.bytebuddy</pattern>
                                     <shadedPattern>${shade.package}.net.bytebuddy</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.apache.commons</pattern>
-                                    <shadedPattern>${shade.package}.org.apache.commons</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.lmax</pattern>
@@ -118,15 +86,23 @@
                                     <shadedPattern>${shade.package}.org.apache.http</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.yaml.snakeyaml</pattern>
-                                    <shadedPattern>${shade.package}.org.yaml.snakeyaml</shadedPattern>
+                                    <pattern>org.apache.commons</pattern>
+                                    <shadedPattern>${shade.package}.org.apache.commons</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>io.protostuff</pattern>
+                                    <shadedPattern>${shade.package}.io.protostuff</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>io.opentracing</pattern>
+                                    <shadedPattern>${shade.package}.io.opentracing</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            <!-- maven-antrun-plugin 将打包生成的agent包移动到生成目录下 -->
+            <!-- maven-antrun-plugin 将打包生成的plugin包移动到agent生成目录下plugins文件夹中 -->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.8</version>
@@ -144,8 +120,9 @@
                                 <if>
                                     <equals arg1="${project.packaging}" arg2="jar"/>
                                     <then>
+                                        <mkdir dir="${plugin.dir}"/>
                                         <copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar"
-                                              tofile="${agent.package.dir}/${project.artifactId}-${project.version}.jar"
+                                              tofile="${plugin.dir}/${project.artifactId}-${project.version}.jar"
                                               overwrite="true"/>
                                     </then>
                                 </if>
@@ -172,31 +149,6 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <!-- maven-resources-plugin 将配置文件拷贝到打包目录 -->
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.2</version>
-                <executions>
-                    <execution>
-                        <id>copy-resource</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${agent.package.dir}</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/src/main/resources</directory>
-                                    <includes>
-                                        <include>**/*.*</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <!--skip deploy-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -208,6 +160,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>

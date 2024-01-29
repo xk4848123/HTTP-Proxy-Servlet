@@ -5,7 +5,7 @@
 # 快速开始
 
 ## 配置简介
-配置文件agentConfig.yml位于模块zary-sniffer-agent模块下resources下
+配置文件agentConfig.yml位于模块zary-honeynet-sniffer-agent模块下resources下
 ```shell
 #匹配模式到目标URL的映射列表，目前支持带*的路径匹配和全路径匹配
 #匹配优先级是从上到下，匹配到就停止匹配
@@ -60,7 +60,6 @@ routes:
     type: proxy
     target: http://127.0.0.1:3005
     stripPrefix: false
-
 ```
 
 
@@ -69,6 +68,6 @@ routes:
 ```shell
 mvn clean package -DskipTests
 ```
-zary-sniffer-x-packages目录，将plugins和zary-sniffer-xxx-agent.xxx.jar复制到需要执行的jar所在目录下
+将zary-honeynet-sniffer-x-packages/sniffer-agent目录下所有文件拷贝到需要执行jar的目录下
 
-执行java -javaagent:zary-sniffer-xxx-agent.xxx.jar -jar xxx.jar即可
+执行java -javaagent:zary-honeynet-sniffer-xxx-agent.xxx.jar -jar xxx.jar即可

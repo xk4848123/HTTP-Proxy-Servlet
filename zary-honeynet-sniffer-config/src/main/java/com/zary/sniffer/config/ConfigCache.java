@@ -2,7 +2,7 @@ package com.zary.sniffer.config;
 
 public class ConfigCache {
 
-    private static Config config;
+    private volatile static Config config;
 
     public static Config getConfig() {
         return config;

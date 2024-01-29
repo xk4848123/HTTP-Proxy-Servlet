@@ -30,4 +30,4 @@ obj/
 *.iml
 /logs/*/info.log.gz
 **/dependency-reduced-pom.xml
-/zary-sniffer-x-packages/sniffer-agent/
+/zary-honeynet-sniffer-x-packages/sniffer-agent/
