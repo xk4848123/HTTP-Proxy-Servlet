@@ -85,9 +85,12 @@ routes:
     stripPrefix: false
 ```
 比较下面两张图可以知晓请求头也被传予目标服务
+
 ![img.png](img/img.png)
+
 ![img.png](img/img2.png)
 
+agentConfig.yml配置如下：
 ```shell
 # 将/pub下的请求交由192.168.120.144:3004处理
 routes:
@@ -97,10 +100,12 @@ routes:
     stripPrefix: false
 ```
 由于/sys/sys-api/judgeGrant没有被代理，并且原SpringBoot也未提供该接口，所以404
+
 ![img.png](img/img3.png)
+
 ![img_1.png](img/img4.png)
 
-越靠前的route处理优先级越高
+agentConfig.yml配置如下：
 ```shell
 # 将/pub下的请求交由192.168.120.144:3004处理，其他请求交由192.168.120.144:3002处理
 routes:
@@ -113,10 +118,15 @@ routes:
     target: http://192.168.120.144:3002
     stripPrefix: false    
 ```
+越靠前的route处理优先级越高
+
 ![img.png](img/img4.png)
+
 ![img.png](img/img5.png)
 
 ### 2.配置直接返回媒体文件(媒体文件包括html、json、xml、txt、mp3、mp4等等)
+
+agentConfig.yml配置如下：
 ```shell
 routes:
   - path: /txt
@@ -132,11 +142,14 @@ routes:
 target为媒体文件相对路径
 
 ![img.png](img/img6.png)
+
 ![img_1.png](img/img7.png)
+
 ![img_2.png](img/img8.png)
 
 ### 3.配置重定向到其他地址
-站内地址，直接写 /uri（uri为你的站内有的地址） 即可
+
+agentConfig.yml配置如下：
 ```shell
 routes:
   - path: /301
@@ -146,12 +159,15 @@ routes:
     type: 302
     target: https://blog.csdn.net/qq_24365213/article/details/78225085
 ```
+站内地址，直接写 /uri（uri为你的站内有的地址） 即可
+
 ![img.png](img/img9.png)
+
 ![img_1.png](img/img10.png)
 
 ### 4.配置插入脚本或增加cookie
 
-
+agentConfig.yml配置如下：
 ```shell
 routes:
   - path: /admin/u/toLogin
