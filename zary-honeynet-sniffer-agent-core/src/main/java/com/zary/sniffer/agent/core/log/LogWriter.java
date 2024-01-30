@@ -6,7 +6,6 @@ import com.zary.sniffer.util.FileUtil;
 import com.zary.sniffer.util.StringUtil;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Date;
 
@@ -49,7 +48,7 @@ public class LogWriter {
                     logDir,
                     logFileHead,
                     DateUtil.toDateString(new Date(), "yyyyMMdd-HHmmssSSS"));
-            if (!FileUtil.isExsit(newFileName)) {
+            if (!FileUtil.isExist(newFileName)) {
                 break;
             }
         }

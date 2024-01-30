@@ -9,8 +9,6 @@ import com.zary.sniffer.agent.core.plugin.AbstractPlugin;
 import com.zary.sniffer.agent.core.plugin.PluginRegister;
 import com.zary.sniffer.agent.core.plugin.loader.AgentClassLoader;
 import com.zary.sniffer.agent.core.plugin.loader.PluginLoader;
-import com.zary.sniffer.config.Config;
-import com.zary.sniffer.config.ConfigCache;
 import com.zary.sniffer.config.ConfigLoader;
 import com.zary.sniffer.util.FileUtil;
 import com.zary.sniffer.util.SystemUtil;
@@ -18,12 +16,9 @@ import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.dynamic.scaffold.TypeValidation;
 import net.bytebuddy.matcher.ElementMatchers;
-import org.yaml.snakeyaml.Yaml;
 
 import javax.naming.ConfigurationException;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.util.List;
@@ -66,7 +61,7 @@ public class AgentStarter {
     private static void initConfig() throws Exception {
         String executePath = SystemUtil.getExecutePath();
         String configFile = executePath + File.separator + CoreConsts.AGENT_CONFIG;
-        boolean isConfigExist = FileUtil.isExsit(configFile);
+        boolean isConfigExist = FileUtil.isExist(configFile);
         if (!isConfigExist) {
             throw new ConfigurationException("Could not find" + CoreConsts.AGENT_CONFIG + "in agent path");
         }
@@ -95,8 +90,8 @@ public class AgentStarter {
     }
 
     private static void logStart(LogLevel logLevel) throws Exception {
-        String excutePath = SystemUtil.getExecutePath();
-        LogUtil.start(excutePath + File.separator + "logs", FILE_MAX_SIZE, logLevel);
+        String executePath = SystemUtil.getExecutePath();
+        LogUtil.start(executePath + File.separator + "logs", FILE_MAX_SIZE, logLevel);
     }
 
 

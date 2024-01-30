@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 public class FileUtil {
 
-    public static boolean isExsit(String filePath) {
+    public static boolean isExist(String filePath) {
         File file = new File(filePath);
         return file.exists();
     }
@@ -56,7 +56,7 @@ public class FileUtil {
      * @return
      */
     public static long getSize(String filePath) {
-        if (!isExsit(filePath)) {
+        if (!isExist(filePath)) {
             return 0;
         }
         File file = new File(filePath);
@@ -76,7 +76,7 @@ public class FileUtil {
         //windows风格反斜杠替换
         filePath = filePath.replaceAll("\\\\", "/");
         //文件已存在
-        if (isExsit(filePath)) {
+        if (isExist(filePath)) {
             return Boolean.TRUE;
         }
         //文件路径创建
@@ -99,7 +99,7 @@ public class FileUtil {
      * @return
      */
     public static boolean write(String filePath, String content, String encoding) throws IOException {
-        if (!isExsit(filePath)) {
+        if (!isExist(filePath)) {
             create(filePath);
         }
         FileOutputStream fileOut = null;
@@ -138,7 +138,7 @@ public class FileUtil {
      * @return
      */
     public static boolean append(String filePath, String content, String encoding) throws IOException {
-        if (!isExsit(filePath)) {
+        if (!isExist(filePath)) {
             create(filePath);
         }
         FileOutputStream fileOut = null;
@@ -221,7 +221,7 @@ public class FileUtil {
      * @return
      */
     public static boolean copyTo(String source, String target) throws IOException {
-        if (!isExsit(source)) {
+        if (!isExist(source)) {
             throw new IllegalArgumentException("source not exsits.");
         }
         create(target);
@@ -273,7 +273,7 @@ public class FileUtil {
      * @return
      */
     public static boolean delete(String filePath) {
-        if (isExsit(filePath)) {
+        if (isExist(filePath)) {
             File file = new File(filePath);
             file.delete();
         }
