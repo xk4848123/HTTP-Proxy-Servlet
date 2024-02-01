@@ -65,7 +65,7 @@ public class AgentStarter {
             throw new ConfigurationException("Could not find" + CoreConsts.AGENT_CONFIG + "in agent path");
         }
 
-        ConfigLoader.loadConfigMonitorChanges(configFile);
+        ConfigLoader.loadConfigMonitorChanges(SystemUtil.getExecutePath(root),configFile);
     }
 
 

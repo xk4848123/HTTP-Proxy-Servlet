@@ -39,20 +39,6 @@ import java.util.*;
 public class HttpProxy implements Closeable {
 
 
-    private static final HttpProxy instance = new HttpProxy();
-
-    public static HttpProxy getInstance() {
-        return instance;
-    }
-
-    private HttpProxy() {
-        try {
-            init();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     protected static final String ATTR_TARGET_URI = HttpProxy.class.getSimpleName() + ".targetUri";
 
     protected static final String ATTR_TARGET_URI_BASE = HttpProxy.class.getSimpleName() + ".targetUriBase";
@@ -70,14 +56,14 @@ public class HttpProxy implements Closeable {
     protected int connectionRequestTimeout = -1;
     protected int maxConnections = -1;
 
-    private HttpClient proxyClient;
+    private HttpClient proxyClient = createHttpClient();
 
     /**
      * 日志收集
      */
-    private LogProducer logProducer;
+    private LogProducer logProducer = LogUtil.getLogProducer();
 
-    private RouteSelector routeSelector;
+    private RouteSelector routeSelector = new RouteSelector();
 
 
     protected String getTargetUri(HttpServletRequest servletRequest) {
@@ -92,63 +78,57 @@ public class HttpProxy implements Closeable {
         return (HttpHost) servletRequest.getAttribute(ATTR_TARGET_HOST);
     }
 
-    private void init() throws ServletException {
+    public void refreshArgs(String root) {
 
-        String doForwardIPString = ConfigCache.getConfig().getForwardIp();
+        String doForwardIPString = ConfigCache.getConfig(root).getForwardIp();
         if (doForwardIPString != null) {
             this.doForwardIP = Boolean.parseBoolean(doForwardIPString);
         }
 
-        String preserveHostString = ConfigCache.getConfig().getPreserveHost();
+        String preserveHostString = ConfigCache.getConfig(root).getPreserveHost();
         if (preserveHostString != null) {
             this.doPreserveHost = Boolean.parseBoolean(preserveHostString);
         }
 
-        String preserveCookiesString = ConfigCache.getConfig().getPreserveCookies();
+        String preserveCookiesString = ConfigCache.getConfig(root).getPreserveCookies();
         if (preserveCookiesString != null) {
             this.doPreserveCookies = Boolean.parseBoolean(preserveCookiesString);
         }
 
-        String handleRedirectsString = ConfigCache.getConfig().getHandleRedirects();
+        String handleRedirectsString = ConfigCache.getConfig(root).getHandleRedirects();
         if (handleRedirectsString != null) {
             this.doHandleRedirects = Boolean.parseBoolean(handleRedirectsString);
         }
 
-        String connectTimeoutString = ConfigCache.getConfig().getSocketTimeout();
+        String connectTimeoutString = ConfigCache.getConfig(root).getSocketTimeout();
         if (connectTimeoutString != null) {
             this.connectTimeout = Integer.parseInt(connectTimeoutString);
         }
 
-        String readTimeoutString = ConfigCache.getConfig().getReadTimeout();
+        String readTimeoutString = ConfigCache.getConfig(root).getReadTimeout();
         if (readTimeoutString != null) {
             this.readTimeout = Integer.parseInt(readTimeoutString);
         }
 
-        String connectionRequestTimeout = ConfigCache.getConfig().getConnectionRequestTimeout();
+        String connectionRequestTimeout = ConfigCache.getConfig(root).getConnectionRequestTimeout();
         if (connectionRequestTimeout != null) {
             this.connectionRequestTimeout = Integer.parseInt(connectionRequestTimeout);
         }
 
-        String maxConnections = ConfigCache.getConfig().getMaxConnections();
+        String maxConnections = ConfigCache.getConfig(root).getMaxConnections();
         if (maxConnections != null) {
             this.maxConnections = Integer.parseInt(maxConnections);
         }
 
-        String useSystemPropertiesString = ConfigCache.getConfig().getUseSystemProperties();
+        String useSystemPropertiesString = ConfigCache.getConfig(root).getUseSystemProperties();
         if (useSystemPropertiesString != null) {
             this.useSystemProperties = Boolean.parseBoolean(useSystemPropertiesString);
         }
 
-        String doHandleCompression = ConfigCache.getConfig().getHandleCompression();
+        String doHandleCompression = ConfigCache.getConfig(root).getHandleCompression();
         if (doHandleCompression != null) {
             this.doHandleCompression = Boolean.parseBoolean(doHandleCompression);
         }
-
-        proxyClient = createHttpClient();
-
-        logProducer = LogUtil.getLogProducer();
-
-        routeSelector = new RouteSelector();
     }
 
 

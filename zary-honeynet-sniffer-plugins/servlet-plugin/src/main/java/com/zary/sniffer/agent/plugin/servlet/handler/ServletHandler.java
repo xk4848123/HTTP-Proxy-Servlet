@@ -23,8 +23,11 @@ public class ServletHandler implements IInstanceMethodHandler {
 
     private RouteSelector routeSelector;
 
+    private HttpProxy httpProxy;
+
     public ServletHandler() {
         this.routeSelector = new RouteSelector();
+        this.httpProxy = new HttpProxy();
     }
 
 
@@ -39,7 +42,7 @@ public class ServletHandler implements IInstanceMethodHandler {
             return;
         }
 
-        Config.Route route = routeSelector.choose(uri);
+        Config.Route route = routeSelector.choose(root, uri);
         if (route == null) {
             return;
         }
@@ -47,7 +50,8 @@ public class ServletHandler implements IInstanceMethodHandler {
         Config.RouteType routeType = Config.RouteType.fromString(route.getType());
 
         if (routeType == Config.RouteType.PROXY) {
-            HttpProxy.getInstance().service(servletRequest, servletResponse, route);
+            httpProxy.refreshArgs(root);
+            httpProxy.service(servletRequest, servletResponse, route);
             result.setReturnValue(null);
         } else if (routeType == Config.RouteType.FILE) {
             MediaHandler.getInstance().service(root, servletRequest, servletResponse, route);
@@ -88,7 +92,7 @@ public class ServletHandler implements IInstanceMethodHandler {
         HttpServletRequest servletRequest = (HttpServletRequest) allArguments[0];
 
         String uri = servletRequest.getRequestURI();
-        Config.Route route = routeSelector.choose(uri);
+        Config.Route route = routeSelector.choose(root, uri);
         if (route != null) {
             Config.RouteType routeType = Config.RouteType.fromString(route.getType());
             if (routeType == Config.RouteType.INJECT_SCRIPT) {

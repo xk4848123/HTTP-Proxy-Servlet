@@ -13,9 +13,9 @@ import java.util.regex.Pattern;
  */
 public class RouteSelector {
 
-    public Config.Route choose(String uri) {
+    public Config.Route choose(String root, String uri) {
 
-        for (Config.Route route : ConfigCache.getConfig().getRoutes()) {
+        for (Config.Route route : ConfigCache.getConfig(root).getRoutes()) {
             String path = route.getPath();
 
             if (!path.contains("*")) {

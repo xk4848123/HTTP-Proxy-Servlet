@@ -7,15 +7,15 @@ import java.io.IOException;
 import java.nio.file.*;
 
 public class ConfigLoader {
-    public static void loadConfigMonitorChanges(String configFile) throws IOException {
+    public static void loadConfigMonitorChanges(String root, String configFile) throws IOException {
         Yaml yaml = new Yaml();
         try (FileInputStream fileInputStream = new FileInputStream(configFile)) {
             Config config = yaml.loadAs(fileInputStream, Config.class);
-            ConfigCache.setConfig(config);
+            ConfigCache.setConfig(root, config);
         }
         Thread watchThread = new Thread(() -> {
             try {
-                watchForChanges(configFile);
+                watchForChanges(root, configFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -23,16 +23,16 @@ public class ConfigLoader {
         watchThread.start();
     }
 
-    public static void loadConfig(String configFile) throws IOException {
+    public static void loadConfig(String root, String configFile) throws IOException {
         Yaml yaml = new Yaml();
         try (FileInputStream fileInputStream = new FileInputStream(configFile)) {
             Config config = yaml.loadAs(fileInputStream, Config.class);
-            ConfigCache.setConfig(config);
+            ConfigCache.setConfig(root, config);
         }
 
     }
 
-    private static void watchForChanges(String configFile) throws IOException {
+    private static void watchForChanges(String root, String configFile) throws IOException {
         Path path = Paths.get(configFile).getParent();
         try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
             path.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
@@ -48,7 +48,7 @@ public class ConfigLoader {
 
                 for (WatchEvent<?> event : key.pollEvents()) {
                     if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-                        loadConfig(configFile);
+                        loadConfig(root, configFile);
                     }
                 }
 

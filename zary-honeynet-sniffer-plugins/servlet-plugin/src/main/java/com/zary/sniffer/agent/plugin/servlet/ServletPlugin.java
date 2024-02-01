@@ -16,7 +16,7 @@ import net.bytebuddy.matcher.ElementMatchers;
  * 2.排除SpringWeb的DispatcherServlet
  */
 public class ServletPlugin extends AbstractPlugin {
-    private static final String HANDLER = "com.zary.sniffer.agent.plugin.servlet.handler.ServletHandler";
+    private static final String HANDLER = "com.zary.sniffer.agent.plugin.spring.handler.ServletHandler";
 
     @Override
     public ElementMatcher<TypeDescription> getPluginTypeMatcher() {
