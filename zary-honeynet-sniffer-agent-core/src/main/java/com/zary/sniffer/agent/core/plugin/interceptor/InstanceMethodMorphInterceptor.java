@@ -19,15 +19,19 @@ public class InstanceMethodMorphInterceptor {
      */
     private IInstanceMethodHandler handler;
 
+    private String agentArgs;
+
     /**
      * 构造函数
      *
+     * @param agentArgs
      * @param handlerImplName point提供的具体拦截处理类名
      * @param classLoader
      */
-    public InstanceMethodMorphInterceptor(String handlerImplName, ClassLoader classLoader) {
+    public InstanceMethodMorphInterceptor(String agentArgs, String handlerImplName, ClassLoader classLoader) {
         try {
-            handler = InterceptorHandlerClassLoader.load(handlerImplName, classLoader);
+            this.handler = InterceptorHandlerClassLoader.load(agentArgs, handlerImplName, classLoader);
+            this.agentArgs = agentArgs;
         } catch (Throwable t) {
             LogUtil.error(String.format(
                     "InstanceMethodMorphInterceptor::create failed.[%s %s]",
@@ -62,7 +66,7 @@ public class InstanceMethodMorphInterceptor {
                             method,
                             (allArguments == null ? "" : StringUtil.join(allArguments, "|"))
                     ));
-            handler.onBefore(obj, method, allArguments, result);
+            handler.onBefore(this.agentArgs, obj, method, allArguments, result);
         } catch (Throwable t) {
             LogUtil.warn(String.format(
                     "InstanceMethodMorphInterceptor::onbefore failed.[%s.%s]",
@@ -94,7 +98,7 @@ public class InstanceMethodMorphInterceptor {
         } finally {
             /** 3.执行after */
             try {
-                Object newReturnValue = handler.onAfter(obj, method, newArguments, returnValue);
+                Object newReturnValue = handler.onAfter(this.agentArgs, obj, method, newArguments, returnValue);
                 if (result.isSubstitute()) {
                     returnValue = newReturnValue;
                 }

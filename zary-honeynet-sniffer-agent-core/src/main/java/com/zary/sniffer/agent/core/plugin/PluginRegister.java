@@ -20,7 +20,7 @@ import java.util.List;
 
 public class PluginRegister {
 
-    public AgentBuilder register(AgentBuilder agentBuilder, List<AbstractPlugin> plugins) {
+    public AgentBuilder register(String agentArgs, AgentBuilder agentBuilder, List<AbstractPlugin> plugins) {
         for (int i = 0; i < plugins.size(); i++) {
             final AbstractPlugin plugin = plugins.get(i);
             LogUtil.info("Plugin" + i, plugin.toString());
@@ -32,21 +32,16 @@ public class PluginRegister {
                 if (constructorPoints != null && constructorPoints.length > 0) {
                     for (int j = 0; j < constructorPoints.length; j++) {
                         final IConstructorPoint point = constructorPoints[j];
-                        AgentBuilder.Transformer transformer = new AgentBuilder.Transformer() {
-                            @Override
-                            public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder,
-                                                                    TypeDescription typeDescription,
-                                                                    ClassLoader classLoader, JavaModule javaModule) {
-                                String handlerName = point.getHandlerClassName();
-                                ElementMatcher<MethodDescription> methodMatcher = point.getConstructorMatcher();
-                                builder = builder.constructor(methodMatcher).intercept(
-                                        SuperMethodCall.INSTANCE
-                                                .andThen(MethodDelegation.withDefaultConfiguration()
-                                                        .to(new ConstructorInterceptor(handlerName, classLoader))
-                                                )
-                                );
-                                return builder;
-                            }
+                        AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, javaModule) -> {
+                            String handlerName = point.getHandlerClassName();
+                            ElementMatcher<MethodDescription> methodMatcher = point.getConstructorMatcher();
+                            builder = builder.constructor(methodMatcher).intercept(
+                                    SuperMethodCall.INSTANCE
+                                            .andThen(MethodDelegation.withDefaultConfiguration()
+                                                    .to(new ConstructorInterceptor(agentArgs, handlerName, classLoader))
+                                            )
+                            );
+                            return builder;
                         };
                         //符合条件的类使用transformer转换
                         agentBuilder = agentBuilder.type(pluginTypeMatcher).transform(transformer);
@@ -58,30 +53,25 @@ public class PluginRegister {
                 if (instanceMethodPoints != null && instanceMethodPoints.length > 0) {
                     for (int j = 0; j < instanceMethodPoints.length; j++) {
                         final IInstanceMethodPoint point = instanceMethodPoints[j];
-                        AgentBuilder.Transformer transformer = new AgentBuilder.Transformer() {
-                            @Override
-                            public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder,
-                                                                    TypeDescription typeDescription,
-                                                                    ClassLoader classLoader, JavaModule javaModule) {
-                                String handlerName = point.getHandlerClassName();
-                                ElementMatcher<MethodDescription> methodMatcher = point.getMethodsMatcher();
-                                boolean isMorph = point.isMorphArgs();
-                                if (!isMorph) {//不需要带参数调用
-                                    builder = builder.method(methodMatcher).intercept(
-                                            MethodDelegation.withDefaultConfiguration()
-                                                    .to(new InstanceMethodInterceptor(handlerName, classLoader))
-                                    );
-                                } else {//需要带参数调用
-                                    builder = builder.method(methodMatcher).intercept(
-                                            MethodDelegation.withDefaultConfiguration()
-                                                    .withBinders(
-                                                            Morph.Binder.install(IMorphCall.class)
-                                                    )
-                                                    .to(new InstanceMethodMorphInterceptor(handlerName, classLoader))
-                                    );
-                                }
-                                return builder;
+                        AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, javaModule) -> {
+                            String handlerName = point.getHandlerClassName();
+                            ElementMatcher<MethodDescription> methodMatcher = point.getMethodsMatcher();
+                            boolean isMorph = point.isMorphArgs();
+                            if (!isMorph) {//不需要带参数调用
+                                builder = builder.method(methodMatcher).intercept(
+                                        MethodDelegation.withDefaultConfiguration()
+                                                .to(new InstanceMethodInterceptor(agentArgs, handlerName, classLoader))
+                                );
+                            } else {//需要带参数调用
+                                builder = builder.method(methodMatcher).intercept(
+                                        MethodDelegation.withDefaultConfiguration()
+                                                .withBinders(
+                                                        Morph.Binder.install(IMorphCall.class)
+                                                )
+                                                .to(new InstanceMethodMorphInterceptor(agentArgs, handlerName, classLoader))
+                                );
                             }
+                            return builder;
                         };
                         //符合条件的类使用transformer转换
                         agentBuilder = agentBuilder.type(pluginTypeMatcher).transform(transformer);
@@ -93,30 +83,25 @@ public class PluginRegister {
                 if (staticMethodPoints != null && staticMethodPoints.length > 0) {
                     for (int j = 0; j < staticMethodPoints.length; j++) {
                         final IStaticMethodPoint point = staticMethodPoints[j];
-                        AgentBuilder.Transformer transformer = new AgentBuilder.Transformer() {
-                            @Override
-                            public DynamicType.Builder<?> transform(DynamicType.Builder<?> builder,
-                                                                    TypeDescription typeDescription,
-                                                                    ClassLoader classLoader, JavaModule javaModule) {
-                                String handlerName = point.getHandlerClassName();
-                                ElementMatcher<MethodDescription> methodMatcher = point.getMethodsMatcher();
-                                boolean isMorph = point.isMorphArgs();
-                                if (!isMorph) {//不需要带参数调用
-                                    builder = builder.method(methodMatcher).intercept(
-                                            MethodDelegation.withDefaultConfiguration()
-                                                    .to(new StaticMethodInterceptor(handlerName))
-                                    );
-                                } else {//需要带参数调用
-                                    builder = builder.method(methodMatcher).intercept(
-                                            MethodDelegation.withDefaultConfiguration()
-                                                    .withBinders(
-                                                            Morph.Binder.install(IMorphCall.class)
-                                                    )
-                                                    .to(new StaticMethodInterceptor(handlerName))
-                                    );
-                                }
-                                return builder;
+                        AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, javaModule) -> {
+                            String handlerName = point.getHandlerClassName();
+                            ElementMatcher<MethodDescription> methodMatcher = point.getMethodsMatcher();
+                            boolean isMorph = point.isMorphArgs();
+                            if (!isMorph) {//不需要带参数调用
+                                builder = builder.method(methodMatcher).intercept(
+                                        MethodDelegation.withDefaultConfiguration()
+                                                .to(new StaticMethodInterceptor(agentArgs, handlerName))
+                                );
+                            } else {//需要带参数调用
+                                builder = builder.method(methodMatcher).intercept(
+                                        MethodDelegation.withDefaultConfiguration()
+                                                .withBinders(
+                                                        Morph.Binder.install(IMorphCall.class)
+                                                )
+                                                .to(new StaticMethodMorphInterceptor(agentArgs, handlerName))
+                                );
                             }
+                            return builder;
                         };
                         //符合条件的类使用transformer转换
                         agentBuilder = agentBuilder.type(pluginTypeMatcher).transform(transformer);

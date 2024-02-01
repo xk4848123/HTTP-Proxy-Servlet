@@ -1,5 +1,6 @@
 package com.zary.sniffer.agent.plugin.servlet.handler;
 
+import com.zary.sniffer.agent.core.log.LogUtil;
 import com.zary.sniffer.agent.core.plugin.define.HandlerBeforeResult;
 import com.zary.sniffer.agent.core.plugin.handler.IInstanceMethodHandler;
 import com.zary.sniffer.agent.plugin.servlet.processor.StatusProcessor;
@@ -28,8 +29,8 @@ public class ServletHandler implements IInstanceMethodHandler {
 
 
     @Override
-    public void onBefore(Object instance, Method method, Object[] allArguments, HandlerBeforeResult result) throws Throwable {
-
+    public void onBefore(String root, Object instance, Method method, Object[] allArguments, HandlerBeforeResult result) throws Throwable {
+        LogUtil.info("ROOT----", root);
         HttpServletRequest servletRequest = (HttpServletRequest) allArguments[0];
         HttpServletResponse servletResponse = (HttpServletResponse) allArguments[1];
 
@@ -49,7 +50,7 @@ public class ServletHandler implements IInstanceMethodHandler {
             HttpProxy.getInstance().service(servletRequest, servletResponse, route);
             result.setReturnValue(null);
         } else if (routeType == Config.RouteType.FILE) {
-            MediaHandler.getInstance().service(servletRequest, servletResponse, route);
+            MediaHandler.getInstance().service(root, servletRequest, servletResponse, route);
             result.setReturnValue(null);
         } else if (routeType == Config.RouteType.REDIRECT_301 || routeType == Config.RouteType.REDIRECT_302 || routeType == Config.RouteType.NOT_FOUND_404 ||
                 routeType == Config.RouteType.UNAUTHORIZED_403 || routeType == Config.RouteType.SERVER_ERROR_500) {
@@ -83,7 +84,7 @@ public class ServletHandler implements IInstanceMethodHandler {
     }
 
     @Override
-    public Object onAfter(Object instance, Method method, Object[] allArguments, Object returnValue) throws Throwable {
+    public Object onAfter(String root, Object instance, Method method, Object[] allArguments, Object returnValue) throws Throwable {
         HttpServletRequest servletRequest = (HttpServletRequest) allArguments[0];
 
         String uri = servletRequest.getRequestURI();
@@ -92,7 +93,7 @@ public class ServletHandler implements IInstanceMethodHandler {
             Config.RouteType routeType = Config.RouteType.fromString(route.getType());
             if (routeType == Config.RouteType.INJECT_SCRIPT) {
                 ContentCachingResponseWrapper servletResponse = (ContentCachingResponseWrapper) allArguments[1];
-                ScriptExporter.getInstance().service(servletRequest, servletResponse, route);
+                ScriptExporter.getInstance().service(root, servletRequest, servletResponse, route);
                 servletResponse.flushToClient();
             }
         }

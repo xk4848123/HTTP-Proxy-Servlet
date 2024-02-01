@@ -1,15 +1,11 @@
 package com.zary.sniffer.agent.plugin.servlet.processor.script;
 
-import com.zary.sniffer.agent.core.log.LogProducer;
-import com.zary.sniffer.agent.core.log.LogUtil;
 import com.zary.sniffer.agent.plugin.servlet.processor.media.MimeTypeEnum;
-import com.zary.sniffer.agent.plugin.servlet.wrapper.ContentCachingResponseWrapper;
 import com.zary.sniffer.config.Config;
 import com.zary.sniffer.util.StringUtil;
 import com.zary.sniffer.util.SystemUtil;
 import org.apache.commons.io.FileUtils;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -37,7 +33,7 @@ public class ScriptExporter {
         return uri2Cookies;
     }
 
-    public void service(HttpServletRequest httpServletRequest, HttpServletResponse servletResponse, Config.Route route) throws Exception {
+    public void service(String root, HttpServletRequest httpServletRequest, HttpServletResponse servletResponse, Config.Route route) throws Exception {
         String contentType = servletResponse.getContentType();
         boolean isContentTypeOK = StringUtil.isStartWithAny(contentType, new String[]{MimeTypeEnum.HTML.getMimeType()});
 
@@ -51,7 +47,7 @@ public class ScriptExporter {
         }
         String scriptContent = "";
         if (route.getTarget() != null) {
-            String basePath = SystemUtil.getExecutePath();
+            String basePath = SystemUtil.getExecutePath(root);
             File file = new File(basePath + File.separator + route.getTarget());
             if (file.exists()) {
                 scriptContent = FileUtils.readFileToString(file, StandardCharsets.UTF_8);

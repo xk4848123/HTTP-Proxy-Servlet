@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
  */
 public interface IStaticMethodHandler {
 
-    void onBefore(Class<?> clz, Method method, Object[] allArguments, HandlerBeforeResult result) throws Throwable;
+    void onBefore(String root, Class<?> clz, Method method, Object[] allArguments, HandlerBeforeResult result) throws Throwable;
 
-    Object onAfter(Class<?> clz, Method method, Object[] allArguments, Object returnValue) throws Throwable;
+    Object onAfter(String root, Class<?> clz, Method method, Object[] allArguments, Object returnValue) throws Throwable;
 }

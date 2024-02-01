@@ -22,15 +22,18 @@ public class InstanceMethodInterceptor {
      */
     private IInstanceMethodHandler handler;
 
+    private String agentArgs;
+
     /**
      * 构造函数
      *
      * @param handlerImplName point提供的具体拦截处理类名
      * @param classLoader
      */
-    public InstanceMethodInterceptor(String handlerImplName, ClassLoader classLoader) {
+    public InstanceMethodInterceptor(String agentArgs, String handlerImplName, ClassLoader classLoader) {
         try {
-            handler = InterceptorHandlerClassLoader.load(handlerImplName, classLoader);
+            this.handler = InterceptorHandlerClassLoader.load(agentArgs, handlerImplName, classLoader);
+            this.agentArgs = agentArgs;
         } catch (Throwable t) {
             LogUtil.error(String.format(
                     "InstanceMethodInterceptor::create failed.[%s %s]",
@@ -67,7 +70,7 @@ public class InstanceMethodInterceptor {
                                 (allArguments == null ? "" : StringUtil.join(allArguments, "|"))
                         ));
             }
-            handler.onBefore(obj, method, allArguments, result);
+            handler.onBefore(agentArgs, obj, method, allArguments, result);
         } catch (Throwable t) {
             LogUtil.warn(String.format(
                     "InstanceMethodInterceptor::onbefore failed.[%s.%s]",
@@ -97,7 +100,7 @@ public class InstanceMethodInterceptor {
         } finally {
             /** 3.执行after */
             try {
-                Object newReturnValue =  handler.onAfter(obj, method, allArguments, returnValue);
+                Object newReturnValue = handler.onAfter(agentArgs, obj, method, allArguments, returnValue);
                 if (result.isSubstitute()) {
                     returnValue = newReturnValue;
                 }

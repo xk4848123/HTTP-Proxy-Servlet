@@ -17,15 +17,19 @@ public class ConstructorInterceptor {
      */
     private IConstructorHandler handler;
 
+    private String agentArgs;
+
     /**
      * 构造函数
      *
+     * @param agentArgs       agent参数
      * @param handlerImplName point提供的具体拦截处理类名
      * @param classLoader
      */
-    public ConstructorInterceptor(String handlerImplName, ClassLoader classLoader) {
+    public ConstructorInterceptor(String agentArgs, String handlerImplName, ClassLoader classLoader) {
         try {
-            handler = InterceptorHandlerClassLoader.load(handlerImplName, classLoader);
+            this.handler = InterceptorHandlerClassLoader.load(agentArgs, handlerImplName, classLoader);
+            this.agentArgs = agentArgs;
         } catch (Throwable t) {
             LogUtil.error("ConstructorInterceptor::create failed.", t);
         }
@@ -40,12 +44,12 @@ public class ConstructorInterceptor {
     @RuntimeType
     public void intercept(@This Object obj, @AllArguments Object[] allArguments) {
         try {
-            handler.onConstruct(obj, allArguments);
+            handler.onConstruct(agentArgs, obj, allArguments);
             LogUtil.debug("ConstructorInterceptor::",
                     String.format("thread=%s,%nobj=%s,%nallArguments=%s",
                             Thread.currentThread().getName(),
                             obj,
-                            (allArguments == null ? "" : StringUtil.join(allArguments,"|"))
+                            (allArguments == null ? "" : StringUtil.join(allArguments, "|"))
                     ));
         } catch (Throwable t) {
             LogUtil.warn("ConstructorInterceptor::intercept failed.", t);

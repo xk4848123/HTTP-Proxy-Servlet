@@ -25,7 +25,7 @@ public class PluginLoader {
      * @return
      */
     public static List<URL> loadPluginDefineFiles(AgentClassLoader classLoader) throws IOException {
-        List<URL> files = new ArrayList<URL>();
+        List<URL> files = new ArrayList<>();
         Enumeration<URL> enums = classLoader.getResources(CoreConsts.PLUGIN_DEFINE_FILE);
         while (enums.hasMoreElements()) {
             URL pluginUrl = enums.nextElement();

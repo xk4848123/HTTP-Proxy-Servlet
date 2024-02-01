@@ -4,10 +4,7 @@ package com.zary.sniffer.agent.plugin.servlet.route;
 import com.zary.sniffer.agent.plugin.servlet.util.UriEncoder;
 import com.zary.sniffer.config.Config;
 import com.zary.sniffer.config.ConfigCache;
-import org.apache.http.HttpHost;
-import org.apache.http.client.utils.URIUtils;
 
-import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

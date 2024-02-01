@@ -37,30 +37,29 @@ public class AgentStarter {
     public static void premain(String agentArgs, Instrumentation inst) {
         AgentStarter agentStarter = new AgentStarter();
 
-        agentStarter.start(inst);
+        agentStarter.start(agentArgs, inst);
     }
 
-    public void start(Instrumentation inst) {
-        start0(inst, LogLevel.INFO);
+    public void start(String agentArgs, Instrumentation inst) {
+        start0(agentArgs, inst, LogLevel.INFO);
     }
 
-    private void start0(Instrumentation inst, LogLevel logLevel) {
+    private void start0(String agentArgs, Instrumentation inst, LogLevel logLevel) {
         try {
-            initConfig();
+            initConfig(agentArgs);
 
             printBanner();
 
-            logStart(logLevel);
+            logStart(agentArgs, logLevel);
 
-            agentStart(inst);
+            agentStart(agentArgs, inst);
         } catch (Throwable t) {
             t.printStackTrace();
         }
     }
 
-    private static void initConfig() throws Exception {
-        String executePath = SystemUtil.getExecutePath();
-        String configFile = executePath + File.separator + CoreConsts.AGENT_CONFIG;
+    private static void initConfig(String root) throws Exception {
+        String configFile = SystemUtil.getExecutePath(root) + File.separator + CoreConsts.AGENT_CONFIG;
         boolean isConfigExist = FileUtil.isExist(configFile);
         if (!isConfigExist) {
             throw new ConfigurationException("Could not find" + CoreConsts.AGENT_CONFIG + "in agent path");
@@ -74,13 +73,13 @@ public class AgentStarter {
         System.out.println(CoreConsts.BANNER_CHARS);
     }
 
-    private void agentStart(Instrumentation inst) throws IOException {
-        AgentClassLoader classLoader = new AgentClassLoader(AgentStarter.class.getClassLoader(), new String[]{CoreConsts.PLUGIN_DIR});
+    private void agentStart(String agentArgs, Instrumentation inst) throws IOException {
+        AgentClassLoader classLoader = new AgentClassLoader(AgentStarter.class.getClassLoader(), agentArgs, new String[]{CoreConsts.PLUGIN_DIR});
         List<AbstractPlugin> plugins = PluginLoader.loadPlugins(classLoader);
         AgentBuilder agentBuilder = initAgentBuilder();
 
         ModuleExporter.export(inst, agentBuilder);
-        agentBuilder = new PluginRegister().register(agentBuilder, plugins);
+        agentBuilder = new PluginRegister().register(agentArgs, agentBuilder, plugins);
         AgentBuilder.Listener listener = new DefaultAgentListener();
         agentBuilder.with(listener).installOn(inst);
 
@@ -89,9 +88,8 @@ public class AgentStarter {
         }
     }
 
-    private static void logStart(LogLevel logLevel) throws Exception {
-        String executePath = SystemUtil.getExecutePath();
-        LogUtil.start(executePath + File.separator + "logs", FILE_MAX_SIZE, logLevel);
+    private static void logStart(String root, LogLevel logLevel) throws Exception {
+        LogUtil.start(SystemUtil.getExecutePath(root) + File.separator + "logs", FILE_MAX_SIZE, logLevel);
     }
 
 

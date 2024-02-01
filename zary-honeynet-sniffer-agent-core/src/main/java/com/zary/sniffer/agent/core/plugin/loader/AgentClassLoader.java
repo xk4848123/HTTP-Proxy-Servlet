@@ -27,23 +27,21 @@ public class AgentClassLoader extends ClassLoader {
     /**
      * 根据参数初始化
      */
-    public AgentClassLoader(ClassLoader parent, String[] dirs) {
+    public AgentClassLoader(ClassLoader parent, String root, String[] dirs) {
         super(parent);
-        initPaths(dirs);
+        initPaths(root, dirs);
         initJars();
     }
 
     /**
      * 初始化文件夹范围
-     *
      */
-    private void initPaths(String[] dirs) {
-        String root = "";
-        jarDirPaths = new ArrayList<File>();
+    private void initPaths(String root, String[] dirs) {
+        jarDirPaths = new ArrayList<>();
         try {
-            root = SystemUtil.getExecutePath(AgentClassLoader.class.getProtectionDomain());
+            root = SystemUtil.getExecutePath(root, AgentClassLoader.class.getProtectionDomain());
             for (String dir : dirs) {
-                jarDirPaths.add(new File(root + "/" + dir));
+                jarDirPaths.add(new File(root + File.separator + dir));
             }
         } catch (Exception e) {
             LogUtil.error("Agent classloader init path failed. root:" + root, e);
@@ -64,7 +62,7 @@ public class AgentClassLoader extends ClassLoader {
                             return name.toLowerCase().endsWith(".jar");
                         }
                     });
-                    if (jarFileNames != null){
+                    if (jarFileNames != null) {
                         for (String fileName : jarFileNames) {
                             File file = new File(dir, fileName);
                             if (file.exists()) {
@@ -94,16 +92,15 @@ public class AgentClassLoader extends ClassLoader {
                     return defineClass(name, data, 0, data.length);
                 }
             } catch (Exception e) {
-                LogUtil.error("read class failed:",e);
+                LogUtil.error("read class failed:", e);
             }
         }
-        LogUtil.error("Agent classloader find class failed:",name);
+        LogUtil.error("Agent classloader find class failed:", name);
         throw new ClassNotFoundException("Agent classloader find class failed:" + name);
     }
 
     /**
      * 资源查找
-     *
      */
     @Override
     protected URL findResource(String name) {
@@ -125,7 +122,6 @@ public class AgentClassLoader extends ClassLoader {
 
     /**
      * 资源查找
-     *
      */
     @Override
     protected Enumeration<URL> findResources(String name) throws IOException {

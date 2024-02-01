@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
  */
 public interface IInstanceMethodHandler {
 
-    void onBefore(Object instance, Method method, Object[] allArguments, HandlerBeforeResult result) throws Throwable;
+    void onBefore(String root, Object instance, Method method, Object[] allArguments, HandlerBeforeResult result) throws Throwable;
 
-    Object onAfter(Object instance, Method method, Object[] allArguments, Object returnValue) throws Throwable;
+    Object onAfter(String root, Object instance, Method method, Object[] allArguments, Object returnValue) throws Throwable;
 }

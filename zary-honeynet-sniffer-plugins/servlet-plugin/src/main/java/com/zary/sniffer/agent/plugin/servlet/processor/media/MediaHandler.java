@@ -20,8 +20,8 @@ public class MediaHandler {
 
     }
 
-    public void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse, Config.Route route) throws Exception {
-        String basePath = SystemUtil.getExecutePath();
+    public void service(String root, HttpServletRequest servletRequest, HttpServletResponse servletResponse, Config.Route route) throws Exception {
+        String basePath = SystemUtil.getExecutePath(root);
         File file = new File(basePath + File.separator + route.getTarget());
         if (!file.exists()) {
             throw new RuntimeException("file not found");

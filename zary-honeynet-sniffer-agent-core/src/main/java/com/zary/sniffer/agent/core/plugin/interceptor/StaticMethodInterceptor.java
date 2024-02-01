@@ -22,13 +22,16 @@ public class StaticMethodInterceptor {
      */
     private String handlerName;
 
+    private String agentArgs;
+
     /**
      * 构造函数
      *
      * @param handlerImplName
      */
-    public StaticMethodInterceptor(String handlerImplName) {
-        handlerName = handlerImplName;
+    public StaticMethodInterceptor(String agentArgs, String handlerImplName) {
+        this.handlerName = handlerImplName;
+        this.agentArgs = agentArgs;
     }
 
     /**
@@ -51,7 +54,7 @@ public class StaticMethodInterceptor {
         //从目标类所在classloader加载拦截类
         IStaticMethodHandler handler = null;
         try {
-            handler = InterceptorHandlerClassLoader.load(handlerName, clazz.getClassLoader());
+            handler = InterceptorHandlerClassLoader.load(this.agentArgs, this.handlerName, clazz.getClassLoader());
             if (handler == null) {
                 throw new RuntimeException();
             }
@@ -70,7 +73,7 @@ public class StaticMethodInterceptor {
                             method,
                             (allArguments == null ? "" : StringUtil.join(allArguments, "|"))
                     ));
-            handler.onBefore(clazz, method, allArguments, result);
+            handler.onBefore(this.agentArgs, clazz, method, allArguments, result);
         } catch (Throwable t) {
             LogUtil.warn(String.format(
                     "StaticMethodInterceptor::onbefore failed.[%s.%s]",
@@ -98,7 +101,7 @@ public class StaticMethodInterceptor {
         } finally {
             /** 3.执行after */
             try {
-                handler.onAfter(clazz, method, allArguments, returnValue);
+                handler.onAfter(this.agentArgs,clazz, method, allArguments, returnValue);
                 LogUtil.debug("StaticMethodInterceptor::exit",
                         String.format("thread=%s,%nclass=%s,%nmethod=%s,%nallArguments=%s,%nreturnValue=%s",
                                 Thread.currentThread().getName(),
